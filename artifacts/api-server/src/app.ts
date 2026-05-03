@@ -37,8 +37,8 @@ app.use(express.urlencoded({ extended: true }));
 const publicDir = path.join(__dirname, "..", "public");
 app.use(express.static(publicDir));
 
-// Redirect /app -> /app.html
-app.get(["/app", "/app/"], (_req, res) => res.redirect(302, "/app.html"));
+// Redirect root and /app to app.html
+app.get(["/", "/app", "/app/"], (_req, res) => res.redirect(302, "/app.html"));
 
 app.use("/api", router);
 
