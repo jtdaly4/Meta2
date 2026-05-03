@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SW Florida Real Estate | MetaState Realty</title>
+    <meta name="description" content="Search homes for sale, rentals, and land in Southwest Florida">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+
+    <style>
+        :root {
+            --primary: #006aff;
+            --primary-dark: #0052cc;
+            --rent: #7c3aed;
+            --land: #00a650;
+            --sold: #ff6b35;
+            --bg-dark: #0d1b2a;
+            --text-primary: #1a1a1a;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 4px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f5f5;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Header with Category Tabs */
+        .header {
+            background: var(--bg-dark);
+            color: white;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .logo img {
+            height: 44px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(255, 255, 255, 0.15);
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .category-tab {
+            padding: 8px 20px;
+            border: none;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .category-tab:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .category-tab.active {
+            background: white;
+            color: var(--text-primary);
+        }
+
+        .category-tab .count {
+            font-size: 11px;
+            padding: 2px 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .category-tab.active .count {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 64px);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: white;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 10px 32px 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 12px center;
+            cursor: pointer;
+            min-width: 130px;
+            appearance: none;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .results-count {
+            margin-left: auto;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .results-count strong {
+            color: var(--text-primary);
+        }
+
+        /* Listings Panel */
+        .listings-panel {
+            width: 440px;
+            min-width: 440px;
+            background: #fafafa;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border);
+        }
+
+        .listings-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .listings-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        /* Listing Cards */
+        .listing-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .listing-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .listing-card.active {
+            box-shadow: 0 0 0 3px var(--primary);
+        }
+
+        .listing-image-wrap {
+            position: relative;
+            height: 180px;
+            background: #e8e8e8;
+        }
+
+        .listing-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .listing-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .listing-badge.for-sale {
+            background: var(--primary);
+            color: white;
+        }
+
+        .listing-badge.for-rent {
+            background: var(--rent);
+            color: white;
+        }
+
+        .listing-badge.land {
+            background: var(--land);
+            color: white;
+        }
+
+        .listing-badge.sold {
+            background: var(--sold);
+            color: white;
+        }
+
+        .listing-content {
+            padding: 16px;
+        }
+
+        .listing-price {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .listing-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .listing-meta strong {
+            color: var(--text-primary);
+        }
+
+        .listing-address {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .listing-address-sub {
+            color: var(--text-secondary);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 16px;
+            background: white;
+            border-top: 1px solid var(--border);
+        }
+
+        .pagination-btn {
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .pagination-info {
+            padding: 0 16px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Map */
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Price Markers */
+        .price-marker {
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transition: all 0.15s;
+        }
+
+        .price-marker:hover,
+        .price-marker.active {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.15);
+        }
+
+        .price-marker.rent {
+            border-color: var(--rent);
+            color: var(--rent);
+        }
+
+        .price-marker.rent:hover,
+        .price-marker.rent.active {
+            background: var(--rent);
+            color: white;
+        }
+
+        .price-marker.land {
+            border-color: var(--land);
+            color: var(--land);
+        }
+
+        .price-marker.land:hover,
+        .price-marker.land.active {
+            background: var(--land);
+            color: white;
+        }
+
+        .price-marker.sold {
+            border-color: var(--sold);
+            color: var(--sold);
+        }
+
+        .price-marker.sold:hover,
+        .price-marker.sold.active {
+            background: var(--sold);
+            color: white;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .empty-state {
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 1024px) {
+            .category-tabs {
+                display: none;
+            }
+
+            .listings-panel {
+                width: 100%;
+                min-width: unset;
+                height: 50vh;
+            }
+
+            .map-container {
+                height: 50vh;
+            }
+
+            .main-container {
+                flex-direction: column-reverse;
+            }
+        }
+
+        /* ================================ */
+        /* PROPERTY DETAIL MODAL STYLES */
+        /* ================================ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 16px;
+            max-width: 1000px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.6);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-gallery {
+            position: relative;
+            height: 360px;
+            background: #1a1a1a;
+            flex-shrink: 0;
+        }
+
+        .gallery-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .gallery-image.active {
+            opacity: 1;
+        }
+
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s;
+        }
+
+        .gallery-nav:hover {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .gallery-nav.prev {
+            left: 16px;
+        }
+
+        .gallery-nav.next {
+            right: 16px;
+        }
+
+        .gallery-dots {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+
+        .gallery-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .gallery-dot.active {
+            background: white;
+            transform: scale(1.3);
+        }
+
+        .gallery-counter {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .modal-body {
+            padding: 24px 32px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .modal-price {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .modal-address {
+            font-size: 18px;
+            color: var(--text-primary);
+            margin-top: 4px;
+        }
+
+        .modal-address-sub {
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        .modal-status-badge {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: var(--primary);
+            color: white;
+        }
+
+        .modal-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 16px;
+            padding: 20px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        .modal-section {
+            margin-bottom: 24px;
+        }
+
+        .modal-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-description {
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        .modal-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .detail-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .detail-value {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px 24px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .modal-btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+        }
+
+        .modal-btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 106, 255, 0.3);
+        }
+
+        .modal-btn-secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .modal-btn-secondary:hover {
+            background: #f5f5f5;
+        }
+
+        .mls-info {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 16px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .modal-container {
+                max-height: 100vh;
+                border-radius: 0;
+            }
+
+            .modal-gallery {
+                height: 260px;
+            }
+
+            .modal-body {
+                padding: 20px;
+            }
+
+            .modal-price {
+                font-size: 28px;
+            }
+
+            .modal-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo">
+            <img src="MetaLogo60923.png" alt="MetaState">
+            <span><strong>MetaState</strong> <span id="region-name" style="font-weight:400;opacity:0.85;">| SW
+                    Florida</span></span>
+        </div>
+
+        <div class="category-tabs">
+            <button class="category-tab active" data-category="for-sale" onclick="setCategory('for-sale')">
+                🏠 For Sale <span class="count" id="count-for-sale">3,629</span>
+            </button>
+            <button class="category-tab" data-category="for-rent" onclick="setCategory('for-rent')">
+                🔑 For Rent <span class="count" id="count-for-rent">749</span>
+            </button>
+            <button class="category-tab" data-category="land" onclick="setCategory('land')">
+                🌳 Land <span class="count" id="count-land">4,135</span>
+            </button>
+            <button class="category-tab" data-category="sold" onclick="setCategory('sold')">
+                ✓ Sold <span class="count" id="count-sold">150</span>
+            </button>
+        </div>
+
+        <div>
+            <button onclick="window.location.href='tracker.html'"
+                style="padding:8px 16px;border:1px solid rgba(255,255,255,0.3);background:transparent;color:white;border-radius:6px;cursor:pointer;">✈️
+                Flight Tracker</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="listings-panel">
+            <div class="filter-bar">
+                <select id="filter-city" class="filter-select" onchange="loadListings()">
+                    <option value="">All Cities</option>
+                    <option value="38058">Punta Gorda</option>
+                    <option value="37395">Port Charlotte</option>
+                    <option value="41535">Sarasota</option>
+                    <option value="48870">Venice</option>
+                    <option value="16608">Fort Myers</option>
+                </select>
+                <select id="filter-price" class="filter-select" onchange="applyFilters()">
+                    <option value="">Any Price</option>
+                    <option value="0-200000">Under $200k</option>
+                    <option value="200000-400000">$200k - $400k</option>
+                    <option value="400000-600000">$400k - $600k</option>
+                    <option value="600000-1000000">$600k - $1M</option>
+                    <option value="1000000-">$1M+</option>
+                </select>
+                <select id="filter-beds" class="filter-select" onchange="applyFilters()">
+                    <option value="">Any Beds</option>
+                    <option value="1">1+ Beds</option>
+                    <option value="2">2+ Beds</option>
+                    <option value="3">3+ Beds</option>
+                    <option value="4">4+ Beds</option>
+                </select>
+                <select id="sort-select" class="filter-select" onchange="sortListings()">
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="date-desc">Newest</option>
+                </select>
+                <span class="results-count"><strong id="results-count">0</strong> results</span>
+            </div>
+
+            <div class="listings-scroll">
+                <div class="listings-grid" id="listings-grid"></div>
+            </div>
+
+            <div class="pagination">
+                <button class="pagination-btn" id="prev-btn" onclick="prevPage()" disabled>← Previous</button>
+                <span class="pagination-info" id="page-info">Page 1 of 1</span>
+                <button class="pagination-btn" id="next-btn" onclick="nextPage()">Next →</button>
+            </div>
+
+            <div class="loading-overlay hidden" id="loading">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <div class="map-container">
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <!-- Property Detail Modal -->
+    <div class="modal-overlay" id="property-modal" onclick="closeModalOnOverlay(event)">
+        <div class="modal-container">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+
+            <!-- Photo Gallery -->
+            <div class="modal-gallery">
+                <div id="gallery-images"></div>
+                <button class="gallery-nav prev" onclick="prevImage()">&#8249;</button>
+                <button class="gallery-nav next" onclick="nextImage()">&#8250;</button>
+                <div class="gallery-counter" id="gallery-counter">1 / 1</div>
+                <div class="gallery-dots" id="gallery-dots"></div>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <div class="modal-header">
+                    <div>
+                        <div class="modal-price" id="modal-price">$0</div>
+                        <div class="modal-address" id="modal-address">Address</div>
+                        <div class="modal-address-sub" id="modal-address-sub">City, FL</div>
+                    </div>
+                    <span class="modal-status-badge" id="modal-status">For Sale</span>
+                </div>
+
+                <div class="modal-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="modal-beds">0</div>
+                        <div class="stat-label">Bedrooms</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="modal-baths">0</div>
+                        <div class="stat-label">Bathrooms</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="modal-sqft">0</div>
+                        <div class="stat-label">Sq Ft</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="modal-acres">0</div>
+                        <div class="stat-label">Lot Size</div>
+                    </div>
+                    <div class="stat-item" id="modal-year-wrap">
+                        <div class="stat-value" id="modal-year">-</div>
+                        <div class="stat-label">Year Built</div>
+                    </div>
+                </div>
+
+                <div class="modal-section" id="modal-desc-section">
+                    <div class="modal-section-title">📝 Description</div>
+                    <div class="modal-description" id="modal-description">No description available.</div>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">📋 Property Details</div>
+                    <div class="modal-details-grid">
+                        <div>
+                            <div class="detail-row">
+                                <span class="detail-label">Property Type</span>
+                                <span class="detail-value" id="modal-proptype">Residential</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Status</span>
+                                <span class="detail-value" id="modal-status-text">Active</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Listed</span>
+                                <span class="detail-value" id="modal-listed">-</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="detail-row">
+                                <span class="detail-label">MLS #</span>
+                                <span class="detail-value" id="modal-mls">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">County</span>
+                                <span class="detail-value" id="modal-county">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Price/SqFt</span>
+                                <span class="detail-value" id="modal-pricesqft">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="modal-btn modal-btn-secondary" onclick="copyListingLink()">
+                        📋 Copy Link
+                    </button>
+                    <a href="#" class="modal-btn modal-btn-primary" id="modal-view-btn" target="_blank">
+                        🏠 View Full Listing
+                    </a>
+                </div>
+
+                <div class="mls-info">
+                    <span id="modal-listing-id">Listing ID: -</span>
+                    <span id="modal-days-on-market">Days on Market: -</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <script>
+        let currentCategory = 'for-sale';
+        let allListings = [];
+        let filteredListings = [];
+        let currentPage = 1;
+        const ITEMS_PER_PAGE = 12;
+        let markers = L.markerClusterGroup({ maxClusterRadius: 50, showCoverageOnHover: false });
+        let markerMap = {};
+
+        // City data with coordinates for map panning
+        const CITY_DATA = {
+            '38058': { name: 'Punta Gorda', lat: 26.9298, lng: -82.0454 },
+            '37395': { name: 'Port Charlotte', lat: 26.9898, lng: -82.0906 },
+            '41535': { name: 'Sarasota', lat: 27.3364, lng: -82.5307 },
+            '48870': { name: 'Venice', lat: 27.0998, lng: -82.4543 },
+            '16608': { name: 'Fort Myers', lat: 26.6406, lng: -81.8723 },
+            '31978': { name: 'Naples', lat: 26.1420, lng: -81.7948 }
+        };
+
+        const CATEGORY_CONFIG = {
+            'for-sale': { badge: 'for-sale', badgeText: 'For Sale', markerClass: '', icon: '🏡' },
+            'for-rent': { badge: 'for-rent', badgeText: 'For Rent', markerClass: 'rent', icon: '🔑', priceSuffix: '/mo' },
+            'land': { badge: 'land', badgeText: 'Land', markerClass: 'land', icon: '🌳' },
+            'sold': { badge: 'sold', badgeText: 'Sold', markerClass: 'sold', icon: '✓' }
+        };
+
+        const map = L.map('map', { center: [26.95, -82.05], zoom: 11 });
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap © CARTO', maxZoom: 19
+        }).addTo(map);
+        map.addLayer(markers);
+
+        function setCategory(category) {
+            currentCategory = category;
+            currentPage = 1;
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.category === category);
+            });
+            loadListings();
+        }
+
+        async function loadListings() {
+            document.getElementById('loading').classList.remove('hidden');
+            const cityId = document.getElementById('filter-city').value;
+
+            // Fetch LIVE active listings from IDX saved links
+            try {
+                const url = cityId ? `/api/idx/listings?cityId=${cityId}` : '/api/idx/listings';
+                const res = await fetch(url);
+                const data = await res.json();
+
+                if (data.data && Array.isArray(data.data)) {
+                    allListings = data.data.map(l => {
+                        // IDX image is a dictionary, get all image URLs
+                        let images = [];
+                        let imageUrl = null;
+                        if (l.image && typeof l.image === 'object') {
+                            images = Object.values(l.image).map(img => img?.url).filter(Boolean);
+                            imageUrl = images[0] || null;
+                        }
+
+                        // Calculate days on market
+                        const listDate = l.dateAdded ? new Date(l.dateAdded) : null;
+                        const daysOnMarket = listDate ? Math.floor((Date.now() - listDate) / (1000 * 60 * 60 * 24)) : null;
+
+                        return {
+                            id: l.listingID || l.idxID + '-' + l.streetNumber,
+                            listingId: l.listingID || l.idxID || '-',
+                            mlsNumber: l.listingID || l.idxID || '-',
+                            address: l.address || `${l.streetNumber} ${l.streetName}` || 'Address TBD',
+                            streetNumber: l.streetNumber || '',
+                            streetName: l.streetName || '',
+                            city: l.cityName || 'Port Charlotte',
+                            cityId: String(l.cityID),
+                            state: l.state || 'FL',
+                            zipcode: l.zipcode || '',
+                            county: l.countyName || l.county || '-',
+                            price: parseFloat(String(l.listingPrice || l.currentPrice || '0').replace(/[$,]/g, '')) || 0,
+                            beds: parseInt(l.bedrooms) || 0,
+                            fullBaths: parseInt(l.fullBaths) || 0,
+                            halfBaths: parseInt(l.halfBaths) || 0,
+                            baths: (parseInt(l.fullBaths) || 0) + (parseInt(l.halfBaths) || 0) * 0.5,
+                            sqft: parseInt(String(l.sqFt || '0').replace(/,/g, '')) || 0,
+                            acres: parseFloat(l.acres) || 0,
+                            yearBuilt: l.yearBuilt || null,
+                            lat: parseFloat(l.latitude) || 0,
+                            lng: parseFloat(l.longitude) || 0,
+                            image: imageUrl,
+                            images: images,
+                            url: l.fullDetailsURL || '#',
+                            dateAdded: l.dateAdded,
+                            daysOnMarket: daysOnMarket,
+                            status: 'Active',
+                            propertyType: l.idxPropType || l.propertyType || 'Residential',
+                            description: l.remarksConcat || l.remarks || l.publicRemarks || '',
+                            listingAgent: l.listingAgentID || null,
+                            listingOffice: l.listingOfficeName || null
+                        };
+                    });
+                    console.log(`Loaded ${allListings.length} LIVE listings from IDX`);
+                } else {
+                    allListings = [];
+                }
+            } catch (e) {
+                console.log('IDX fetch error:', e);
+                allListings = [];
+            }
+
+            // Update counts with actual numbers if we have real data
+            if (allListings.length > 0) {
+                document.getElementById('count-for-sale').textContent = allListings.length.toLocaleString();
+            }
+
+            // If no real listings, use sample data for demo
+            if (allListings.length === 0) {
+                allListings = generateListings(currentCategory);
+            }
+
+            filteredListings = [...allListings];
+            applyFilters();
+            document.getElementById('loading').classList.add('hidden');
+        }
+
+        function generateListings(category) {
+            const cities = [
+                { id: '38058', name: 'Punta Gorda', lat: 26.9298, lng: -82.0454 },
+                { id: '37395', name: 'Port Charlotte', lat: 26.9898, lng: -82.0906 },
+                { id: '41535', name: 'Sarasota', lat: 27.3364, lng: -82.5307 },
+                { id: '48870', name: 'Venice', lat: 27.0998, lng: -82.4543 }
+            ];
+            const streets = ['Palm Dr', 'Ocean Blvd', 'Sunset Way', 'Harbor View Ln', 'Gulf Shore Dr', 'Beach Rd', 'Marina Way', 'Tamiami Trl'];
+            const listings = [];
+            const count = category === 'land' ? 40 : 60;
+
+            for (let i = 0; i < count; i++) {
+                const city = cities[Math.floor(Math.random() * cities.length)];
+                let price, beds, baths, sqft, acres;
+
+                if (category === 'for-rent') {
+                    price = Math.floor(Math.random() * 3000) + 1200;
+                    beds = Math.floor(Math.random() * 3) + 1;
+                    baths = beds;
+                    sqft = Math.floor(Math.random() * 1000) + 800;
+                    acres = 0;
+                } else if (category === 'land') {
+                    acres = parseFloat((Math.random() * 5 + 0.1).toFixed(2));
+                    price = Math.floor(acres * (Math.random() * 80000 + 20000));
+                    beds = 0; baths = 0; sqft = 0;
+                } else {
+                    price = Math.floor(Math.random() * 800000) + 200000;
+                    beds = Math.floor(Math.random() * 4) + 2;
+                    baths = beds - Math.floor(Math.random() * 2);
+                    sqft = Math.floor(Math.random() * 2000) + 1200;
+                    acres = parseFloat((Math.random() * 0.5 + 0.1).toFixed(2));
+                }
+
+                listings.push({
+                    id: `${category}-${i}`,
+                    address: `${Math.floor(Math.random() * 9000) + 1000} ${streets[Math.floor(Math.random() * streets.length)]}`,
+                    city: city.name,
+                    cityId: city.id,
+                    price, beds, baths, sqft, acres,
+                    lat: city.lat + (Math.random() - 0.5) * 0.08,
+                    lng: city.lng + (Math.random() - 0.5) * 0.08,
+                    image: null,
+                    dateAdded: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString()
+                });
+            }
+            return listings;
+        }
+
+        function applyFilters() {
+            const cityId = document.getElementById('filter-city').value;
+            const price = document.getElementById('filter-price').value;
+            const beds = document.getElementById('filter-beds').value;
+
+            // Filter listings - ensure string comparison for cityId
+            filteredListings = allListings.filter(l => {
+                if (cityId && String(l.cityId) !== String(cityId)) return false;
+                if (price) {
+                    const [min, max] = price.split('-').map(Number);
+                    if (l.price < (min || 0)) return false;
+                    if (max && l.price > max) return false;
+                }
+                if (beds && currentCategory !== 'land' && l.beds < parseInt(beds)) return false;
+                return true;
+            });
+
+            // Pan map to selected city
+            if (cityId && CITY_DATA[cityId]) {
+                const cityInfo = CITY_DATA[cityId];
+                map.setView([cityInfo.lat, cityInfo.lng], 12);
+                // Update region name in header
+                const regionEl = document.getElementById('region-name');
+                if (regionEl) regionEl.textContent = `| ${cityInfo.name}`;
+            } else {
+                // Reset to SW Florida view
+                map.setView([26.95, -82.05], 10);
+                const regionEl = document.getElementById('region-name');
+                if (regionEl) regionEl.textContent = '| SW Florida';
+            }
+
+            // Update category counts based on filtered city (simulated counts)
+            updateCategoryCounts(cityId);
+
+            currentPage = 1;
+            sortListings();
+        }
+
+        // Update the tab counts based on selected city
+        function updateCategoryCounts(cityId) {
+            // These are approximate counts from IDX - would be updated with real API data
+            const baseCounts = {
+                '': { forSale: 3629, forRent: 749, land: 4135, sold: 150 },
+                '38058': { forSale: 1745, forRent: 425, land: 1158, sold: 75 },
+                '37395': { forSale: 1884, forRent: 324, land: 2977, sold: 75 },
+                '41535': { forSale: 2500, forRent: 600, land: 800, sold: 120 },
+                '48870': { forSale: 1200, forRent: 280, land: 500, sold: 60 },
+                '16608': { forSale: 3000, forRent: 700, land: 1500, sold: 100 },
+                '31978': { forSale: 4500, forRent: 900, land: 1200, sold: 150 }
+            };
+
+            const counts = baseCounts[cityId] || baseCounts[''];
+            document.getElementById('count-for-sale').textContent = counts.forSale.toLocaleString();
+            document.getElementById('count-for-rent').textContent = counts.forRent.toLocaleString();
+            document.getElementById('count-land').textContent = counts.land.toLocaleString();
+            document.getElementById('count-sold').textContent = counts.sold.toLocaleString();
+        }
+
+        function sortListings() {
+            const sort = document.getElementById('sort-select').value;
+            filteredListings.sort((a, b) => {
+                if (sort === 'price-desc') return b.price - a.price;
+                if (sort === 'price-asc') return a.price - b.price;
+                return new Date(b.dateAdded) - new Date(a.dateAdded);
+            });
+            renderListings();
+            renderMarkers();
+        }
+
+        function renderListings() {
+            const grid = document.getElementById('listings-grid');
+            const start = (currentPage - 1) * ITEMS_PER_PAGE;
+            const pageListings = filteredListings.slice(start, start + ITEMS_PER_PAGE);
+            const config = CATEGORY_CONFIG[currentCategory];
+
+            document.getElementById('results-count').textContent = filteredListings.length;
+
+            if (!pageListings.length) {
+                grid.innerHTML = `<div class="empty-state"><div class="empty-state-icon">${config.icon}</div><h3>No listings found</h3><p>Try adjusting filters</p></div>`;
+                return;
+            }
+
+            grid.innerHTML = pageListings.map(l => `
+                <div class="listing-card" data-id="${l.id}" onclick="selectListing('${l.id}')" 
+                     onmouseenter="highlightMarker('${l.id}',true)" onmouseleave="highlightMarker('${l.id}',false)">
+                    <div class="listing-image-wrap">
+                        ${l.image ? `<img src="${l.image}" class="listing-image" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                            <div class="listing-image listing-fallback" style="display:none;align-items:center;justify-content:center;font-size:56px;color:#999;background:linear-gradient(135deg,#e8e8e8 0%,#f5f5f5 100%);">${config.icon}</div>` :
+                    `<div class="listing-image" style="display:flex;align-items:center;justify-content:center;font-size:56px;color:#999;background:linear-gradient(135deg,#e8e8e8 0%,#f5f5f5 100%);">${config.icon}</div>`}
+                        <span class="listing-badge ${config.badge}">${config.badgeText}</span>
+                    </div>
+                    <div class="listing-content">
+                        <div class="listing-price">$${l.price.toLocaleString()}${config.priceSuffix || ''}</div>
+                        <div class="listing-meta">
+                            ${currentCategory === 'land' ? `<span><strong>${l.acres}</strong> acres</span>` :
+                    `<span><strong>${l.beds}</strong> bd</span><span><strong>${l.baths}</strong> ba</span><span><strong>${l.sqft.toLocaleString()}</strong> sqft</span>`}
+                        </div>
+                        <div class="listing-address">${l.address}<br><span class="listing-address-sub">${l.city}, FL</span></div>
+                    </div>
+                </div>
+            `).join('');
+            updatePagination();
+        }
+
+        function renderMarkers() {
+            markers.clearLayers();
+            markerMap = {};
+            const start = (currentPage - 1) * ITEMS_PER_PAGE;
+            const pageListings = filteredListings.slice(start, start + ITEMS_PER_PAGE);
+            const config = CATEGORY_CONFIG[currentCategory];
+
+            pageListings.forEach(l => {
+                if (!l.lat || !l.lng) return;
+                const icon = L.divIcon({
+                    className: '',
+                    html: `<div class="price-marker ${config.markerClass}" data-id="${l.id}">$${l.price >= 1000000 ? (l.price / 1000000).toFixed(1) + 'M' : Math.round(l.price / 1000) + 'K'}${config.priceSuffix || ''}</div>`,
+                    iconSize: [80, 28], iconAnchor: [40, 14]
+                });
+                const marker = L.marker([l.lat, l.lng], { icon });
+                marker.bindPopup(`<strong>$${l.price.toLocaleString()}</strong><br>${l.beds} bd | ${l.baths} ba<br>${l.address}`);
+                marker.on('click', () => selectListing(l.id));
+                markers.addLayer(marker);
+                markerMap[l.id] = marker;
+            });
+            if (markers.getLayers().length) map.fitBounds(markers.getBounds(), { padding: [40, 40] });
+        }
+
+        function selectListing(id) {
+            document.querySelectorAll('.listing-card').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.price-marker').forEach(m => m.classList.remove('active'));
+            const card = document.querySelector(`.listing-card[data-id="${id}"]`);
+            if (card) { card.classList.add('active'); }
+
+            // Find listing - search filteredListings first (current visible listings), then allListings
+            const listing = filteredListings.find(l => String(l.id) === String(id)) ||
+                allListings.find(l => String(l.id) === String(id));
+            if (listing) {
+                openPropertyModal(listing);
+            }
+        }
+
+        // ================================
+        // PROPERTY MODAL FUNCTIONS
+        // ================================
+        let currentGalleryIndex = 0;
+        let currentModalListing = null;
+
+        function openPropertyModal(listing) {
+            currentModalListing = listing;
+            currentGalleryIndex = 0;
+
+            // Populate modal data
+            document.getElementById('modal-price').textContent = '$' + listing.price.toLocaleString();
+            document.getElementById('modal-address').textContent = listing.address;
+            document.getElementById('modal-address-sub').textContent = [listing.city, listing.state, listing.zipcode].filter(Boolean).join(', ').replace(/, $/, '');
+            document.getElementById('modal-status').textContent = currentCategory === 'for-rent' ? 'For Rent' : 'For Sale';
+
+            // Stats
+            document.getElementById('modal-beds').textContent = listing.beds || '-';
+            document.getElementById('modal-baths').textContent = listing.baths || '-';
+            document.getElementById('modal-sqft').textContent = listing.sqft ? listing.sqft.toLocaleString() : '-';
+            document.getElementById('modal-acres').textContent = listing.acres ? listing.acres.toFixed(2) + ' ac' : '-';
+            document.getElementById('modal-year').textContent = listing.yearBuilt || '-';
+
+            // Details
+            document.getElementById('modal-proptype').textContent = listing.propertyType || 'Residential';
+            document.getElementById('modal-status-text').textContent = listing.status || 'Active';
+            document.getElementById('modal-mls').textContent = listing.mlsNumber || '-';
+            document.getElementById('modal-county').textContent = listing.county || '-';
+            document.getElementById('modal-pricesqft').textContent = listing.sqft ? '$' + Math.round(listing.price / listing.sqft) : '-';
+
+            // Format listed date
+            if (listing.dateAdded) {
+                const date = new Date(listing.dateAdded);
+                document.getElementById('modal-listed').textContent = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            } else {
+                document.getElementById('modal-listed').textContent = '-';
+            }
+
+            // Description
+            const descSection = document.getElementById('modal-desc-section');
+            if (listing.description && listing.description.trim()) {
+                descSection.style.display = 'block';
+                document.getElementById('modal-description').textContent = listing.description;
+            } else {
+                descSection.style.display = 'none';
+            }
+
+            // Footer info
+            document.getElementById('modal-listing-id').textContent = 'Listing ID: ' + (listing.listingId || '-');
+            document.getElementById('modal-days-on-market').textContent = 'Days on Market: ' + (listing.daysOnMarket ?? '-');
+
+            // View button
+            document.getElementById('modal-view-btn').href = listing.url || '#';
+
+            // Setup gallery
+            setupGallery(listing.images || (listing.image ? [listing.image] : []));
+
+            // Show modal
+            document.getElementById('property-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function setupGallery(images) {
+            const container = document.getElementById('gallery-images');
+            const dotsContainer = document.getElementById('gallery-dots');
+
+            if (!images || images.length === 0) {
+                // No images - show placeholder
+                container.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#e8e8e8;font-size:80px;color:#999;">🏠</div>';
+                dotsContainer.innerHTML = '';
+                document.getElementById('gallery-counter').textContent = '0 / 0';
+                document.querySelector('.gallery-nav.prev').style.display = 'none';
+                document.querySelector('.gallery-nav.next').style.display = 'none';
+                return;
+            }
+
+            // Create image elements
+            container.innerHTML = images.map((url, i) =>
+                `<img src="${url}" class="gallery-image ${i === 0 ? 'active' : ''}" style="position:absolute;inset:0;">`
+            ).join('');
+
+            // Create dots
+            dotsContainer.innerHTML = images.map((_, i) =>
+                `<button class="gallery-dot ${i === 0 ? 'active' : ''}" onclick="goToImage(${i})"></button>`
+            ).join('');
+
+            // Show/hide nav buttons
+            const showNav = images.length > 1;
+            document.querySelector('.gallery-nav.prev').style.display = showNav ? 'flex' : 'none';
+            document.querySelector('.gallery-nav.next').style.display = showNav ? 'flex' : 'none';
+
+            updateGalleryCounter(images.length);
+        }
+
+        function updateGalleryCounter(total) {
+            document.getElementById('gallery-counter').textContent = `${currentGalleryIndex + 1} / ${total}`;
+        }
+
+        function goToImage(index) {
+            const images = document.querySelectorAll('#gallery-images .gallery-image');
+            const dots = document.querySelectorAll('.gallery-dot');
+            if (images.length === 0) return;
+
+            currentGalleryIndex = index;
+            images.forEach((img, i) => img.classList.toggle('active', i === index));
+            dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+            updateGalleryCounter(images.length);
+        }
+
+        function prevImage() {
+            const images = document.querySelectorAll('#gallery-images .gallery-image');
+            if (images.length === 0) return;
+            const newIndex = currentGalleryIndex === 0 ? images.length - 1 : currentGalleryIndex - 1;
+            goToImage(newIndex);
+        }
+
+        function nextImage() {
+            const images = document.querySelectorAll('#gallery-images .gallery-image');
+            if (images.length === 0) return;
+            const newIndex = currentGalleryIndex === images.length - 1 ? 0 : currentGalleryIndex + 1;
+            goToImage(newIndex);
+        }
+
+        function closeModal() {
+            document.getElementById('property-modal').classList.remove('active');
+            document.body.style.overflow = '';
+            currentModalListing = null;
+        }
+
+        function closeModalOnOverlay(e) {
+            if (e.target.id === 'property-modal') {
+                closeModal();
+            }
+        }
+
+        function copyListingLink() {
+            if (currentModalListing && currentModalListing.url) {
+                navigator.clipboard.writeText(currentModalListing.url).then(() => {
+                    const btn = event.target.closest('.modal-btn');
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '✓ Copied!';
+                    setTimeout(() => btn.innerHTML = originalText, 2000);
+                });
+            }
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+            if (e.key === 'ArrowLeft' && document.getElementById('property-modal').classList.contains('active')) prevImage();
+            if (e.key === 'ArrowRight' && document.getElementById('property-modal').classList.contains('active')) nextImage();
+        });
+
+        function highlightMarker(id, active) {
+            const el = document.querySelector(`.price-marker[data-id="${id}"]`);
+            if (el) el.classList.toggle('active', active);
+        }
+
+        function updatePagination() {
+            const total = Math.ceil(filteredListings.length / ITEMS_PER_PAGE) || 1;
+            document.getElementById('page-info').textContent = `Page ${currentPage} of ${total}`;
+            document.getElementById('prev-btn').disabled = currentPage <= 1;
+            document.getElementById('next-btn').disabled = currentPage >= total;
+        }
+
+        function prevPage() { if (currentPage > 1) { currentPage--; renderListings(); renderMarkers(); document.querySelector('.listings-scroll').scrollTop = 0; } }
+        function nextPage() { const total = Math.ceil(filteredListings.length / ITEMS_PER_PAGE); if (currentPage < total) { currentPage++; renderListings(); renderMarkers(); document.querySelector('.listings-scroll').scrollTop = 0; } }
+
+        document.addEventListener('DOMContentLoaded', loadListings);
+    </script>
+</body>
+
+</html>

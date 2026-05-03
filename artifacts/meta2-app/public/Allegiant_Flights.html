@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Schedule Finder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        select, button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+        }
+        .results {
+            margin-top: 20px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Flight Schedule Finder</h1>
+        <label for="airportCode">Select Airport Code:</label>
+        <select id="airportCode">
+            <!-- Options will be dynamically added here -->
+        </select>
+        <button onclick="fetchFlightSchedule()">Get Flight Schedule</button>
+
+        <div class="results" id="results"></div>
+    </div>
+
+    <script>
+        const airportCodes = [
+            { city: 'Akron-Canton', code: 'CAK' },
+            { city: 'Albany', code: 'ALB' },
+            { city: 'Allentown (Lehigh Valley)', code: 'ABE' },
+            { city: 'Appleton / Green Bay', code: 'ATW' },
+            // Add more airports as needed
+        ];
+
+        window.onload = function() {
+            const dropdown = document.getElementById('airportCode');
+            airportCodes.forEach(airport => {
+                const option = document.createElement('option');
+                option.value = airport.code;
+                option.text = `${airport.city} (${airport.code})`;
+                dropdown.add(option);
+            });
+        };
+
+        function fetchFlightSchedule() {
+            const airportCode = document.getElementById('airportCode').value;
+            const resultsDiv = document.getElementById('results');
+
+            resultsDiv.innerHTML = `<p>Fetching flight schedule for ${airportCode} to Punta Gorda (PGD)...</p>`;
+
+            // Fetch flight schedule data from the Node.js server
+            const apiUrl = `/api/flights?dep_iata=${airportCode}&arr_iata=PGD`;
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayFlightSchedule(data);
+                })
+                .catch(error => {
+                    resultsDiv.innerHTML = `<p>Error fetching data: ${error}</p>`;
+                });
+        }
+
+        function displayFlightSchedule(data) {
+            const resultsDiv = document.getElementById('results');
+            if (data.data.length === 0) {
+                resultsDiv.innerHTML = '<p>No flights found.</p>';
+                return;
+            }
+
+            let html = '<h2>Flight Schedule</h2><ul>';
+            data.data.forEach(flight => {
+                html += `<li>Airline: ${flight.airline.name}, Departure: ${flight.departure.scheduled}, Arrival: ${flight.arrival.scheduled}</li>`;
+            });
+            html += '</ul>';
+            resultsDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

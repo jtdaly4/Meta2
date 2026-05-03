@@ -1,0 +1,34 @@
+[
+    {
+        "city": "Akron-Canton",
+        "state": "OH",
+        "airport_code": "CAK",
+        "lat": 40.9161,
+        "lng": -81.4422,
+        "hub": "PGD"
+    },
+    {
+        "city": "Albany",
+        "state": "NY",
+        "airport_code": "ALB",
+        "lat": 42.7483,
+        "lng": -73.8017,
+        "hub": "PGD"
+    },
+    {
+        "city": "Allentown (Lehigh Valley)",
+        "state": "PA",
+        "airport_code": "ABE",
+        "lat": 40.6518,
+        "lng": -75.4428,
+        "hub": "SRQ"
+    },
+    {
+        "city": "Appleton / Green Bay",
+        "state": "WI",
+        "airport_code": "ATW",
+        "lat": 44.2581,
+        "lng": -88.5191,
+        "hub": "SRQ"
+    }
+]
