@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Allegiant Tracker">
+    <title>Flight Tracker | MetaState Realty</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Leaflet & Vendor Styles -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        :root {
+            --allegiant-blue: #1c4b82;
+            --allegiant-orange: #f28b2d;
+            --sold-green: #2b8a3e;
+            /* New Color for Sold/Closed */
+            --map-bg: #f5f7fa;
+            --text-dark: #333;
+        }
+
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--map-bg);
+            overflow: hidden;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 320px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 600px) {
+            #ui-layer {
+                top: auto;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                max-height: 50vh;
+                border-radius: 20px 20px 0 0;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+
+            h1 {
+                font-size: 18px;
+            }
+        }
+
+        h1 {
+            color: var(--allegiant-blue);
+            font-size: 20px;
+            margin: 0 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--allegiant-orange);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .airport-toggle {
+            display: flex;
+            background: #eee;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 15px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            background: white;
+            color: var(--allegiant-blue);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .layer-control {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .layer-switch {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            gap: 10px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .switch-input {
+            width: 40px;
+            height: 20px;
+            appearance: none;
+            background: #ddd;
+            border-radius: 20px;
+            position: relative;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .switch-input:checked {
+            background: var(--sold-green);
+        }
+
+        .switch-input::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .switch-input:checked::after {
+            left: 22px;
+        }
+
+        select.community-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            color: var(--text-dark);
+            background-color: #f9f9f9;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        select.community-select:disabled {
+            background-color: #eee;
+            color: #aaa;
+            cursor: not-allowed;
+        }
+
+        #map {
+            height: 100vh;
+            width: 100vw;
+            z-index: 1;
+        }
+
+        /* Plane Icon Animation */
+        .plane-icon {
+            transition: all 1s linear;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="ui-layer">
+        <h1>
+            <img src="MetaLogo60923.png" height="28" alt="MetaState">
+            <span><strong>MetaState</strong> <span style="font-weight:400;opacity:0.7;">| Flight Tracker</span></span>
+        </h1>
+
+        <div class="airport-toggle">
+            <button class="toggle-btn active" onclick="switchAirport('PGD')">PGD (Punta Gorda)</button>
+            <button class="toggle-btn" onclick="switchAirport('SRQ')">SRQ (Sarasota)</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-value" id="flight-count">0</div>
+                <div class="stat-label">Inbound<br>Flights</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="origin-count">0</div>
+                <div class="stat-label">Unique<br>Origins</div>
+            </div>
+        </div>
+
+        <p style="font-size: 13px; color: #888; line-height: 1.4;">
+            Real-time tracking of Allegiant Air flights arriving into
+            <strong id="current-airport-name">Punta Gorda (PGD)</strong>.
+            <br><br>
+            <span style="color: var(--allegiant-orange);">●</span> Inbound Flight
+            <br>
+            <span style="color: var(--allegiant-blue);">●</span> Origin City
+        </p>
+
+        <div class="layer-control">
+            <label class="layer-switch">
+                <input type="checkbox" class="switch-input" id="buyer-toggle" onchange="toggleBuyers(this.checked)">
+                Show Sold/Closed
+            </label>
+
+            <div id="community-filter-container" style="display: none; margin-top: 10px;">
+                <label
+                    style="font-size: 12px; font-weight: 600; color: #666; display: block; margin-bottom: 4px;">Filter
+                    by Community</label>
+                <select id="community-select" class="community-select" onchange="filterBuyers()">
+                    <option value="All">All Communities</option>
+                    <!-- Options populated via JS -->
+                </select>
+            </div>
+
+            <p style="font-size: 11px; color: #999; margin: 10px 0 0 0;">
+                <span style="color: var(--sold-green); font-weight: bold;">● Green bubbles</span> indicate density of
+                sold/closed deals by Area Code.
+            </p>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.curve/0.5.2/leaflet.curve.min.js"></script>
+    <script>
+        // Init Map
+        const map = L.map('map', {
+            zoomControl: false,
+            center: [39.0, -96.0], // Center of US
+            zoom: 5
+        });
+
+        // Basemap: Carto Voyager — stronger roads & admin boundaries than Positron "light"
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        // Country + state outlines (above basemap, below flight / buyer layers)
+        const boundaryGroup = L.layerGroup().addTo(map);
+
+        function adm0Code(feature) {
+            const p = feature.properties || {};
+            return p.ADM0_A3 || p.adm0_a3 || p.ISO_A3 || p.iso_a3 || '';
+        }
+
+        async function loadBoundaryOutlines() {
+            const countryStyle = {
+                color: '#0d1f33',
+                weight: 2.75,
+                opacity: 1,
+                fillOpacity: 0,
+                lineJoin: 'round',
+                lineCap: 'round',
+            };
+            const stateStyle = {
+                color: '#1c4b82',
+                weight: 1.65,
+                opacity: 0.92,
+                fillOpacity: 0,
+                lineJoin: 'round',
+                lineCap: 'round',
+            };
+            const neBase = 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson';
+            try {
+                const [cRes, sRes] = await Promise.all([
+                    fetch(`${neBase}/ne_110m_admin_0_countries.geojson`),
+                    fetch(`${neBase}/ne_110m_admin_1_states_provinces.geojson`),
+                ]);
+                if (!cRes.ok || !sRes.ok) throw new Error('Natural Earth fetch failed');
+
+                const countries = await cRes.json();
+                const usaCountry = {
+                    type: 'FeatureCollection',
+                    features: countries.features.filter((f) => adm0Code(f) === 'USA'),
+                };
+                L.geoJSON(usaCountry, { style: () => countryStyle, interactive: false }).addTo(boundaryGroup);
+
+                const admin1 = await sRes.json();
+                const usStates = {
+                    type: 'FeatureCollection',
+                    features: admin1.features.filter((f) => adm0Code(f) === 'USA'),
+                };
+                L.geoJSON(usStates, { style: () => stateStyle, interactive: false }).addTo(boundaryGroup);
+            } catch (e) {
+                console.warn('Boundary outlines unavailable (offline or blocked); map still works.', e);
+            }
+        }
+        loadBoundaryOutlines();
+
+        // State
+        let currentAirport = 'PGD';
+        let airportDb = {};
+        /** @type {Record<string, object>} ICAO (uppercase) → same airport record as airportDb */
+        let airportDbByIcao = {};
+        let areaCodeDb = {};
+        let rawBuyerData = []; // Store raw list for generic filtering
+
+        const targets = {
+            'PGD': { lat: 26.9189, lng: -81.9908, city: 'Punta Gorda' },
+            'SRQ': { lat: 27.3956, lng: -82.5544, city: 'Sarasota' }
+        };
+        // Separation of Layers
+        const flightLayers = L.layerGroup().addTo(map);
+        const buyerLayers = L.layerGroup();
+
+        // Load Databases
+        async function loadData() {
+            try {
+                // Parallel Load
+                const [airResp, acResp] = await Promise.all([
+                    fetch('airports.json'),
+                    fetch('area-codes.json')
+                ]);
+
+                const airData = await airResp.json();
+                Object.values(airData).forEach(apt => {
+                    if (apt.iata) airportDb[apt.iata] = apt;
+                    if (apt.icao) airportDbByIcao[String(apt.icao).toUpperCase()] = apt;
+                });
+
+                const acData = await acResp.json();
+                acData.forEach(item => {
+                    areaCodeDb[String(item.code)] = item;
+                });
+
+                console.log('DBs loaded:', { airports: Object.keys(airportDb).length, areaCodes: Object.keys(areaCodeDb).length });
+
+                fetchFlights();
+
+            } catch (e) { console.error("Data Load Error", e); }
+        }
+
+        // Switch Airport
+        window.switchAirport = (code) => {
+            currentAirport = code;
+            document.querySelectorAll('.toggle-btn').forEach(b => {
+                b.classList.toggle('active', b.innerText.includes(code));
+            });
+            document.getElementById('current-airport-name').innerText = targets[code].city + ` (${code})`;
+            fetchFlights();
+        };
+
+        // Toggle Buyers
+        window.toggleBuyers = (show) => {
+            const filterDiv = document.getElementById('community-filter-container');
+            if (show) {
+                map.addLayer(buyerLayers);
+                filterDiv.style.display = 'block';
+                if (rawBuyerData.length === 0) {
+                    fetchAndInitBuyers();
+                }
+            } else {
+                map.removeLayer(buyerLayers);
+                filterDiv.style.display = 'none';
+            }
+        };
+
+        // Fetch Buyers & Init Dropdown
+        async function fetchAndInitBuyers() {
+            try {
+                const res = await fetch('/api/buyers');
+                rawBuyerData = await res.json(); // [{ ac: "239", community: "XYZ" }, ...]
+
+                populateCommunities();
+                renderBuyers(); // Render "All" initially
+            } catch (e) {
+                console.error("Buyer Fetch Error", e);
+            }
+        }
+
+        function populateCommunities() {
+            const select = document.getElementById('community-select');
+            const unique = new Set();
+            rawBuyerData.forEach(b => {
+                if (b.community) unique.add(b.community);
+            });
+
+            // Sort
+            const sorted = Array.from(unique).sort();
+
+            sorted.forEach(comm => {
+                const opt = document.createElement('option');
+                opt.value = comm;
+                opt.innerText = comm;
+                select.appendChild(opt);
+            });
+        }
+
+        // Filter and Render
+        window.filterBuyers = async () => {
+            renderBuyers();
+            
+            const selectedComm = document.getElementById('community-select').value;
+            if (selectedComm !== 'All') {
+                const comm = rawBuyerData.find(b => b.community === selectedComm && b.city);
+                if (comm) {
+                    try {
+                        let lat, lon, isApprox = false;
+
+                        // Check if we have hardcoded coordinates from the backend
+                        if (comm.lat && comm.lon) {
+                            lat = comm.lat;
+                            lon = comm.lon;
+                        } else {
+                            const addr = `${comm.address || ''} ${comm.city || ''} FL`.trim();
+                            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&countrycodes=us&q=${encodeURIComponent(addr)}`);
+                            const matches = await res.json();
+                            
+                            if (matches && matches.length > 0) {
+                                lat = matches[0].lat;
+                                lon = matches[0].lon;
+                            } else if (comm.city) {
+                                // Fallback to city
+                                const resCity = await fetch(`https://nominatim.openstreetmap.org/search?format=json&countrycodes=us&q=${encodeURIComponent(comm.city + ', FL')}`);
+                                const matchesCity = await resCity.json();
+                                if (matchesCity && matchesCity.length > 0) {
+                                    lat = matchesCity[0].lat;
+                                    lon = matchesCity[0].lon;
+                                    isApprox = true;
+                                }
+                            }
+                        }
+                        
+                        if (lat && lon) {
+                            // Draw red pin marker using default Leaflet UI
+                            L.marker([lat, lon])
+                                .bindPopup(`<b style="color:#1c4b82;font-size:15px;">${selectedComm}</b><hr style="margin:4px 0"><span style="font-size:12px;color:#666;">${isApprox ? '📍 Approx City:' : '📍 Property Address:'}</span><br><b>${comm.address ? comm.address + '<br>' : ''}</b>${comm.city}, FL`)
+                                .addTo(buyerLayers)
+                                .openPopup();
+                                
+                            // Gently fly to Florida location to highlight it while still showing flights to America
+                            map.flyTo([lat, lon], 6, { duration: 1.5 });
+                        }
+                    } catch (e) {
+                       console.error("Geocoding failed", e);
+                    }
+                }
+            } else {
+                map.flyTo([39.0, -96.0], 5, { duration: 1.5 });
+            }
+        };
+
+        function renderBuyers() {
+            buyerLayers.clearLayers();
+            const selectedComm = document.getElementById('community-select').value;
+            const isAll = selectedComm === 'All';
+
+            // 1. Filter
+            const filtered = isAll
+                ? rawBuyerData
+                : rawBuyerData.filter(b => b.community === selectedComm);
+
+            // 2. Aggregate counts per Area Code
+            // Structure: { '239': { total: 10, comms: { 'Verde': 6, 'Addison': 4 } } }
+            const agg = {};
+
+            filtered.forEach(b => {
+                const ac = b.ac;
+                if (!agg[ac]) agg[ac] = { total: 0, comms: {} };
+
+                agg[ac].total++;
+
+                // Track community breakdown if "All" is selected
+                if (isAll) {
+                    const cName = b.community || 'Unknown';
+                    agg[ac].comms[cName] = (agg[ac].comms[cName] || 0) + 1;
+                }
+            });
+
+            // 3. Draw
+            Object.entries(agg).forEach(([ac, data]) => {
+                const info = areaCodeDb[ac];
+                if (info && info.lat && info.lon) {
+                    const count = data.total;
+
+                    // Radius Calculation
+                    // If "All", use a more compressed logarithmic scale to prevent huge bubbles
+                    let r;
+                    if (isAll) {
+                        // Logarithmic scale: 4 + 3 * ln(count)
+                        // count=1 -> 4
+                        // count=10 -> 4 + 6.9 = ~11
+                        // count=100 -> 4 + 13.8 = ~18
+                        // count=1000 -> 4 + 20.7 = ~25
+                        r = Math.min(30, 4 + Math.log(count) * 3);
+                    } else {
+                        // Square root scale for smaller datasets (Standard)
+                        r = Math.min(50, 5 + Math.sqrt(count) * 4);
+                    }
+
+                    // Build Popup Content
+                    let popupContent = `
+                        <div style="text-align:center; min-width: 150px;">
+                            <b>${info.city || 'Area ' + ac}</b><br>
+                            <span style="font-size:16px; font-weight:bold; color:#2b8a3e">${count} Sold/Closed</span><br>
+                            <span style="font-size:10px; color:#666">Area Code ${ac}</span>
+                            <hr style="margin: 5px 0; border: 0; border-top: 1px solid #eee;">
+                    `;
+
+                    if (isAll) {
+                        // Add Community Breakdown
+                        // Sort communities by count descending
+                        const sortedComms = Object.entries(data.comms)
+                            .sort((a, b) => b[1] - a[1]); // [ ['Verde', 10], ['Addison', 5] ]
+
+                        popupContent += `<div style="max-height: 100px; overflow-y: auto; text-align: left; font-size: 11px;">`;
+
+                        sortedComms.forEach(([name, num]) => {
+                            popupContent += `
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                                    <span style="color: #444;">${name}</span>
+                                    <strong style="color: #2b8a3e;">${num}</strong>
+                                </div>
+                            `;
+                        });
+
+                        popupContent += `</div>`;
+                    } else {
+                        popupContent += `<span style="font-size:10px; color:#888">${selectedComm}</span>`;
+                    }
+
+                    popupContent += `</div>`;
+
+                    L.circleMarker([info.lat, info.lon], {
+                        color: '#2b8a3e', // Green
+                        fillColor: '#40c057',
+                        fillOpacity: 0.6,
+                        radius: r,
+                        weight: 1
+                    })
+                        .bindPopup(popupContent)
+                        .addTo(buyerLayers);
+                }
+            });
+        }
+
+        // Fetch Flights
+        async function fetchFlights() {
+            flightLayers.clearLayers();
+            const target = targets[currentAirport];
+
+            // Draw Target Airport Marker
+            L.circleMarker([target.lat, target.lng], {
+                color: '#fff',
+                fillColor: '#f28b2d',
+                fillOpacity: 1,
+                radius: 8,
+                weight: 2
+            }).addTo(flightLayers).bindPopup(`<b>${target.city} (${currentAirport})</b>`);
+
+            try {
+                const res = await fetch(`/api/inbound?airport=${currentAirport}`);
+                const json = await res.json();
+                const flights = json.data || [];
+
+                processFlights(flights);
+            } catch (e) {
+                console.error("API Error", e);
+            }
+        }
+
+        function resolveDepartureAirport(flight) {
+            const dep = flight.departure;
+            if (!dep) return null;
+            const iata = dep.iata && String(dep.iata).trim();
+            if (iata && airportDb[iata]) {
+                return { apt: airportDb[iata], code: iata };
+            }
+            const icao = dep.icao && String(dep.icao).trim().toUpperCase();
+            if (icao && airportDbByIcao[icao]) {
+                const apt = airportDbByIcao[icao];
+                return { apt, code: apt.iata || icao };
+            }
+            return null;
+        }
+
+        function processFlights(flights) {
+            const origins = new Set();
+            const target = targets[currentAirport];
+
+            flights.forEach(flight => {
+                const resolved = resolveDepartureAirport(flight);
+                if (!resolved) return;
+                const { apt: depApt, code: depCode } = resolved;
+
+                if (depApt) {
+                    origins.add(depCode);
+                    const startLat = parseFloat(depApt.lat);
+                    const startLng = parseFloat(depApt.lon);
+
+                    const depName = flight.departure.airport || depApt.name || 'Origin';
+                    // Draw Origin Marker
+                    L.circleMarker([startLat, startLng], {
+                        color: '#fff',
+                        fillColor: '#1c4b82',
+                        fillOpacity: 0.8,
+                        radius: 5,
+                        weight: 1
+                    }).addTo(flightLayers).bindPopup(`${depName} (${depCode})`);
+
+                    // Draw Curve Line (Bézier-ish)
+                    const path = L.polyline([[startLat, startLng], [target.lat, target.lng]], {
+                        color: '#a0c4ff',
+                        weight: 2,
+                        opacity: 0.6,
+                        dashArray: '5, 10'
+                    }).addTo(flightLayers);
+
+                    // Plane Icon
+                    const planeIcon = L.divIcon({
+                        className: 'plane-icon',
+                        html: '<div style="font-size:16px; transform: rotate(-45deg);">✈️</div>',
+                        iconSize: [20, 20]
+                    });
+
+                    // Add plane at midpoint
+                    L.marker([(startLat + target.lat) / 2, (startLng + target.lng) / 2], { icon: planeIcon }).addTo(flightLayers);
+                }
+            });
+
+            // Update Stats
+            document.getElementById('flight-count').innerText = flights.length;
+            document.getElementById('origin-count').innerText = origins.size;
+        }
+
+        // Start
+        loadData();
+
+    </script>
+</body>
+
+</html>

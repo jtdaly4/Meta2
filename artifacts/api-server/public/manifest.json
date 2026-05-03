@@ -1,0 +1,15 @@
+{
+    "name": "Allegiant Inbound Tracker",
+    "short_name": "InboundTracker",
+    "start_url": "/tracker.html",
+    "display": "standalone",
+    "background_color": "#f5f7fa",
+    "theme_color": "#1c4b82",
+    "icons": [
+        {
+            "src": "https://companieslogo.com/img/orig/ALGT-4c632836.png?t=1720244490",
+            "sizes": "192x192",
+            "type": "image/png"
+        }
+    ]
+}

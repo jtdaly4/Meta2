@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>METASTATE | Southwest Florida Command</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <style>
+    :root {
+      --navy: #0D1B2A;
+      --gold: #C9A84C;
+      --light-gold: #E8D5A3;
+      --green: #40c057;
+      --white: #FFFFFF;
+      --top-nav-height: 48px;
+      --left-pane-width: clamp(280px, 33.333vw, 420px);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: var(--navy);
+      color: var(--navy);
+      overflow: hidden;
+    }
+
+    .app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      min-height: 0;
+    }
+
+    .top-nav {
+      flex: 0 0 var(--top-nav-height);
+      height: var(--top-nav-height);
+      background: var(--navy);
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 2000;
+      border-bottom: 1px solid rgba(201, 168, 76, 0.25);
+    }
+    .brand {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+    }
+    .nav-logo {
+      height: 42px;
+      width: auto;
+      display: block;
+      filter: invert(1);
+      mix-blend-mode: screen;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+    .nav-tab {
+      background: transparent;
+      border: none;
+      color: var(--light-gold);
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      padding: 8px 12px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      border-radius: 4px 4px 0 0;
+    }
+    .nav-tab:hover { color: var(--white); }
+    .nav-tab.active {
+      color: var(--gold);
+      border-bottom-color: var(--gold);
+    }
+
+    .main-row {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      min-height: 0;
+      position: relative;
+    }
+
+    /* ── Single left pane: 1/3 of page ── */
+    .left-pane {
+      width: var(--left-pane-width);
+      flex: 0 0 var(--left-pane-width);
+      background: rgba(14, 20, 32, 0.82);
+      backdrop-filter: blur(18px) saturate(150%);
+      -webkit-backdrop-filter: blur(18px) saturate(150%);
+      box-shadow: 4px 0 32px rgba(0,0,0,0.40);
+      z-index: 1400;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      border-right: 1px solid rgba(255,255,255,0.07);
+    }
+
+    /* Layers section inside left pane */
+    .layers-section {
+      flex-shrink: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 12px 16px 14px;
+    }
+    .section-head {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(201, 168, 76, 0.65);
+      margin-bottom: 12px;
+    }
+
+    /* Content section: tabbed INVENTORY / FLIGHTS / MARKET */
+    .content-section {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 16px 16px;
+      min-height: 0;
+    }
+
+    #map {
+      flex: 1;
+      min-width: 0;
+      min-height: 0;
+      z-index: 1;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .layer-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .switch {
+      width: 44px;
+      height: 24px;
+      appearance: none;
+      background: rgba(255,255,255,0.18);
+      border-radius: 24px;
+      position: relative;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .switch:checked { background: #2e6b4a; }
+    .switch::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      background: radial-gradient(circle, #111 48%, #fff 48%);
+      border-radius: 50%;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+      transition: transform 0.2s;
+    }
+    .switch:checked::after { transform: translateX(20px); }
+    .layer-label { flex: 1; color: rgba(255,255,255,0.88); font-size: 13px; font-weight: 500; }
+    .badge-count {
+      background: rgba(201, 168, 76, 0.12);
+      color: var(--gold);
+      border: 1px solid rgba(201, 168, 76, 0.30);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+
+    .airport-toggle {
+      display: flex;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 8px;
+      padding: 3px;
+      margin: 12px 0 8px;
+    }
+    .air-toggle-btn {
+      flex: 1;
+      border: none;
+      background: none;
+      padding: 7px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      color: rgba(255,255,255,0.50);
+      letter-spacing: 0.05em;
+      transition: all 0.15s;
+    }
+    .air-toggle-btn.active {
+      background: rgba(201, 168, 76, 0.20);
+      color: var(--gold);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+    }
+
+    .stats-footer {
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      font-size: 11px;
+      text-align: center;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.04em;
+    }
+    .stats-footer strong { display: block; font-size: 16px; color: var(--white); font-weight: 700; }
+
+    .filter-group { margin-bottom: 14px; }
+    .filter-group label { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.65); display: block; margin-bottom: 6px; letter-spacing: 0.04em; }
+    .filter-group input[type="range"] { width: 100%; accent-color: var(--gold); }
+    .range-val { font-size: 11px; color: var(--gold); }
+    select.filter-select {
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.12);
+      font-family: inherit;
+      background: rgba(255,255,255,0.07);
+      color: rgba(255,255,255,0.88);
+      font-size: 13px;
+    }
+    select.filter-select option { background: #1a2232; color: #fff; }
+    .chk-row { display: flex; align-items: center; gap: 8px; font-size: 14px; margin-top: 8px; color: rgba(255,255,255,0.75); }
+
+    .comm-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .comm-card:hover {
+      background: rgba(201, 168, 76, 0.10);
+      border-color: rgba(201, 168, 76, 0.30);
+    }
+    .comm-card h4 { margin: 0 0 4px; font-size: 14px; color: rgba(255,255,255,0.92); }
+    .comm-card .meta { font-size: 12px; color: rgba(255,255,255,0.45); }
+    .secret-pill {
+      display: inline-block;
+      margin-top: 6px;
+      background: rgba(201, 168, 76, 0.18);
+      color: var(--gold);
+      border: 1px solid rgba(201, 168, 76, 0.40);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.06em;
+    }
+
+    .flight-list {
+      max-height: 40vh;
+      overflow-y: auto;
+      margin-top: 12px;
+    }
+    .flight-item {
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      font-size: 13px;
+      color: rgba(255,255,255,0.75);
+    }
+    .flight-item b { color: rgba(255,255,255,0.95); }
+    .btn-refresh {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px;
+      border: 1px solid rgba(201, 168, 76, 0.35);
+      border-radius: 8px;
+      background: rgba(201, 168, 76, 0.12);
+      color: var(--gold);
+      font-weight: 700;
+      font-family: inherit;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-refresh:hover { background: rgba(201, 168, 76, 0.22); }
+
+    .market-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .market-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+    .market-card .v { font-size: 18px; font-weight: 700; color: var(--white); }
+    .market-card .k { font-size: 10px; color: rgba(255,255,255,0.45); text-transform: uppercase; margin-top: 4px; word-break: break-word; letter-spacing: 0.05em; }
+    .spinner {
+      border: 3px solid rgba(255,255,255,0.10);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      animation: spin 0.8s linear infinite;
+      margin: 16px auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .market-unavailable { color: rgba(255,100,100,0.80); font-size: 14px; margin-top: 12px; }
+
+    /* Right detail panel */
+    .detail-panel {
+      position: fixed;
+      top: var(--top-nav-height);
+      right: 0;
+      width: 360px;
+      max-width: 100%;
+      height: calc(100vh - var(--top-nav-height));
+      background: var(--white);
+      box-shadow: -4px 0 24px rgba(13, 27, 42, 0.15);
+      z-index: 1600;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.28s ease;
+      min-height: 0;
+    }
+    .detail-panel.open { transform: translateX(0); }
+
+    /* dark overlay behind panel — click it to close */
+    .detail-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(13,27,42,0.35);
+      z-index: 1595;
+      display: none;
+    }
+    .detail-backdrop.open { display: block; }
+
+    .detail-head {
+      padding: 14px 56px 14px 16px;
+      border-bottom: 1px solid #eee;
+      position: relative;
+      flex-shrink: 0;
+      background: var(--navy);
+    }
+    .detail-head h2 {
+      margin: 0 0 6px;
+      font-size: 18px;
+      color: var(--white);
+    }
+    .detail-close {
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      transform: translateY(-50%);
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.12);
+      border-radius: 8px;
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      color: var(--white);
+      transition: background 0.15s;
+    }
+    .detail-close:hover { background: rgba(255,255,255,0.25); }
+    .unit-count-badge {
+      display: inline-block;
+      background: rgba(201,168,76,0.25);
+      color: var(--light-gold);
+      font-weight: 700;
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(201,168,76,0.5);
+    }
+    .detail-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px 100px;
+      min-height: 0;
+    }
+    .unit-card {
+      border: 1px solid #e5e5e5;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+    .unit-card .plan { font-weight: 700; font-size: 15px; color: var(--navy); }
+    .unit-card .lot { font-size: 12px; color: #888; margin-bottom: 8px; }
+    .stage-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+    .stage-start { background: #228be6; color: #fff; }
+    .stage-second { background: #fd7e14; color: #fff; }
+    .stage-final { background: var(--green); color: #fff; }
+    .stage-other { background: #868e96; color: #fff; }
+    .price-line { display: flex; justify-content: space-between; margin: 4px 0; color: #444; }
+    .price-line.total {
+      border-top: 1px solid #ddd;
+      margin-top: 10px;
+      padding-top: 10px;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--navy);
+    }
+    .incentive-badge {
+      background: var(--light-gold);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      margin-top: 8px;
+      display: inline-block;
+    }
+    .fin-line { margin-top: 6px; font-size: 12px; color: #444; }
+    .coop-badge {
+      display: inline-block;
+      margin-top: 8px;
+      background: #e7f5ff;
+      color: #1864ab;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    .unlisted-badge {
+      display: inline-block;
+      margin-top: 8px;
+      background: var(--gold);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    .detail-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px 16px 16px;
+      background: linear-gradient(to top, #fff 80%, rgba(255,255,255,0));
+      border-top: 1px solid #eee;
+    }
+    .cta-btn {
+      display: block;
+      width: 100%;
+      height: 44px;
+      line-height: 44px;
+      text-align: center;
+      background: var(--gold);
+      color: var(--navy);
+      font-weight: 700;
+      text-decoration: none;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+    }
+
+    /* OA widget — anchored bottom-right over the map */
+    .oa-fab {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      left: auto;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: var(--navy);
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      z-index: 1700;
+      font-family: inherit;
+    }
+    .oa-panel {
+      position: fixed;
+      bottom: 90px;
+      right: 24px;
+      left: auto;
+      width: 320px;
+      height: 460px;
+      max-height: calc(100vh - 120px);
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+      z-index: 1700;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .oa-panel.open { display: flex; }
+    .oa-head {
+      background: var(--navy);
+      color: var(--gold);
+      padding: 12px 40px 12px 12px;
+      font-weight: 700;
+      position: relative;
+    }
+    .oa-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: transparent;
+      border: none;
+      color: var(--light-gold);
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .oa-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      font-size: 13px;
+      background-color: #fff8f0;
+      background-image: url('ryan-realtor.png');
+      background-repeat: no-repeat;
+      background-position: center bottom;
+      background-size: 60% auto;
+      position: relative;
+    }
+    /* Fades the image so chat text stays readable */
+    .oa-messages::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 248, 240, 0.70);
+      pointer-events: none;
+      z-index: 0;
+    }
+    /* Keep messages above the overlay */
+    .oa-msg { position: relative; z-index: 1; margin-bottom: 10px; padding: 8px 10px; border-radius: 8px; max-width: 92%; }
+    .oa-msg.bot { background: #eef2ff; color: #333; align-self: flex-start; }
+    .oa-msg.user { background: var(--navy); color: var(--white); margin-left: auto; }
+    .oa-input-row {
+      display: flex;
+      gap: 8px;
+      padding: 10px;
+      border-top: 1px solid #eee;
+      background: #fff;
+    }
+    .oa-input-row input {
+      flex: 1;
+      padding: 8px 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-family: inherit;
+    }
+    .oa-send {
+      padding: 8px 14px;
+      background: var(--gold);
+      color: var(--navy);
+      border: none;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Keep left pane on the LEFT at all sizes */
+    @media (max-width: 1100px) {
+      :root { --left-pane-width: clamp(240px, 33.333vw, 360px); }
+    }
+    @media (max-width: 767px) {
+      .top-nav {
+        padding: 0 10px;
+        flex-wrap: wrap;
+        height: auto;
+        min-height: var(--top-nav-height);
+      }
+      .brand { font-size: 15px; }
+      .nav-tabs { flex-wrap: wrap; justify-content: flex-end; gap: 2px; }
+      .nav-tab { font-size: 10px; padding: 6px 8px; }
+      :root { --left-pane-width: clamp(180px, 40vw, 260px); }
+      .layers-section { padding: 10px 10px 12px; }
+      .content-section { padding: 10px; }
+      .layer-row { font-size: 12px; gap: 8px; margin-bottom: 10px; }
+      .section-head { font-size: 9px; margin-bottom: 8px; }
+      .stats-footer { grid-template-columns: repeat(2,1fr); gap:6px; font-size:10px; }
+      .stats-footer strong { font-size: 14px; }
+      .detail-panel { top: 0; height: 100vh; width: 100%; }
+      .oa-fab { bottom: 18px; right: 12px; }
+      .oa-panel { right: 12px; left: 12px; width: auto; max-width: min(320px, calc(100vw - 24px)); }
+    }
+    /* ── Price legend ── */
+    .price-legend { padding: 0 4px; }
+    .legend-chips { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+    .legend-chip {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 11px; color: rgba(255,255,255,0.65);
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 5px;
+      transition: opacity 0.18s, transform 0.18s, background 0.15s;
+      user-select: none;
+    }
+    .legend-chip:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.90); }
+    .legend-swatch {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      border: 2px solid rgba(255,255,255,0.25);
+      box-shadow: 0 1px 3px rgba(0,0,0,.35);
+    }
+    .legend-note {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 6px;
+    }
+    .legend-note .legend-swatch { width: 12px; height: 12px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-nav">
+      <div class="brand">
+          <img src="meta-logo-cropped.png" alt="Meta State Realty" class="nav-logo" />
+        </div>
+      <nav class="nav-tabs" aria-label="Main">
+        <button type="button" class="nav-tab active" data-tab="inventory">INVENTORY</button>
+        <button type="button" class="nav-tab" data-tab="flights">FLIGHTS</button>
+        <button type="button" class="nav-tab" data-tab="market">MARKET</button>
+      </nav>
+    </header>
+    <div class="main-row">
+      <aside class="left-pane" aria-label="Controls">
+
+        <!-- ── MAP LAYERS ── -->
+        <div class="layers-section">
+          <div class="section-head">Map Layers</div>
+          <div class="layer-row">
+            <input type="checkbox" class="switch" id="tog-flights" checked data-layer="flights" />
+            <span class="layer-label">✈️ Allegiant Flights</span>
+            <span class="badge-count" id="count-flights-layer">0</span>
+          </div>
+          <div class="airport-toggle" id="layers-airport-toggle" role="group" aria-label="Arrival airport">
+            <button type="button" class="air-toggle-btn active" data-air="PGD">PGD</button>
+            <button type="button" class="air-toggle-btn" data-air="SRQ">SRQ</button>
+          </div>
+          <div class="layer-row">
+            <input type="checkbox" class="switch" id="tog-buyers" checked data-layer="buyers" />
+            <span class="layer-label">🏠 Buyer Origins</span>
+            <span class="badge-count" id="count-buyers-layer">0</span>
+          </div>
+          <div class="layer-row">
+            <input type="checkbox" class="switch" id="tog-listed" checked data-layer="listed" />
+            <span class="layer-label">◉ Listed Inventory</span>
+            <span class="badge-count" id="count-listed-layer">0</span>
+          </div>
+          <div class="layer-row">
+            <input type="checkbox" class="switch" id="tog-secret" checked data-layer="secret" />
+            <span class="layer-label">🔒 Secret Inventory</span>
+            <span class="badge-count" id="count-secret-layer">0</span>
+          </div>
+          <div class="stats-footer">
+            <div><strong id="stat-flights">0</strong>Flights</div>
+            <div><strong id="stat-markets">0</strong>Markets</div>
+            <div><strong id="stat-listed">0</strong>Listed</div>
+            <div><strong id="stat-secret">0</strong>Secret</div>
+          </div>
+
+          <!-- ── Price legend ── -->
+          <div class="price-legend">
+            <div class="section-head" style="margin-top:12px">Price Scale</div>
+            <div class="legend-chips" id="price-legend-chips"></div>
+            <div class="legend-note">
+              <span class="legend-swatch" style="border:3px solid #C9A84C;background:transparent"></span>
+              Gold border = unlisted / secret
+            </div>
+          </div>
+        </div>
+
+        <!-- ── TABBED CONTENT ── -->
+        <div class="content-section">
+          <section class="tab-panel active" data-panel="inventory">
+            <div class="filter-group">
+              <label>Min price <span class="range-val" id="min-price-label"></span></label>
+              <input type="range" id="min-price" min="200000" max="2000000" step="10000" value="200000" />
+            </div>
+            <div class="filter-group">
+              <label>Max price <span class="range-val" id="max-price-label"></span></label>
+              <input type="range" id="max-price" min="200000" max="2000000" step="10000" value="2000000" />
+            </div>
+            <div class="filter-group">
+              <label>Stage</label>
+              <select class="filter-select" id="filter-stage">
+                <option value="all">All</option>
+                <option value="start">Start</option>
+                <option value="second">Second</option>
+                <option value="final">Final</option>
+              </select>
+            </div>
+            <label class="chk-row"><input type="checkbox" id="filter-secret-only" /> Secret only</label>
+            <div id="inventory-cards"></div>
+          </section>
+          <section class="tab-panel" data-panel="flights">
+            <div class="airport-toggle" id="flights-airport-toggle">
+              <button type="button" class="air-toggle-btn active" data-air="PGD">PGD</button>
+              <button type="button" class="air-toggle-btn" data-air="SRQ">SRQ</button>
+            </div>
+            <p style="font-size:14px;margin:8px 0;color:rgba(255,255,255,0.80)"><strong id="flights-stat-line">0 Flights | 0 Origins</strong></p>
+            <button type="button" class="btn-refresh" id="btn-refresh-flights">Refresh flights</button>
+            <div class="flight-list" id="flight-list"></div>
+          </section>
+          <section class="tab-panel" data-panel="market">
+            <p style="font-size:13px;color:rgba(255,255,255,0.45);letter-spacing:0.04em">Parcl market inventory (Punta Gorda CBSA)</p>
+            <div id="market-content"></div>
+          </section>
+        </div>
+
+      </aside>
+      <div id="map"></div>
+    </div>
+  </div>
+
+  <div class="detail-backdrop" id="detail-backdrop"></div>
+  <div class="detail-panel" id="detail-panel" aria-hidden="true">
+    <div class="detail-head">
+      <button type="button" class="detail-close" id="detail-close" aria-label="Close">×</button>
+      <h2 id="detail-title">Community</h2>
+      <span class="unit-count-badge" id="detail-count">0 units</span>
+    </div>
+    <div class="detail-scroll" id="detail-scroll"></div>
+    <div class="detail-footer">
+      <a class="cta-btn" id="detail-cta" href="mailto:info@metastaterealty.com">CONTACT OA AGENT</a>
+    </div>
+  </div>
+
+  <button type="button" class="oa-fab" id="oa-fab" aria-label="Open OA chat">OA</button>
+  <div class="oa-panel" id="oa-panel">
+    <div class="oa-head">
+      OA — Outside Agent
+      <button type="button" class="oa-close" id="oa-close" aria-label="Close chat">×</button>
+    </div>
+    <div class="oa-messages" id="oa-messages"></div>
+    <div class="oa-input-row">
+      <input type="text" id="oa-input" placeholder="Type a message…" autocomplete="off" />
+      <button type="button" class="oa-send" id="oa-send">Send</button>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script>
+(function () {
+  const COLORS = {
+    navy: '#0D1B2A',
+    gold: '#C9A84C',
+    green: '#40c057',
+    orangeDest: '#f28b2d',
+    routeBlue: '#4a90d9',
+    originBlue: '#2264A8',
+  };
+
+  // ── Price tier color scale ──────────────────────────────────────────────────
+  // Atelier palette: sea-glass → antique brass → amber → garnet → bordeaux
+  const PRICE_TIERS = [
+    { max:  450000, color: '#7fa8a0', label: 'Under $450K'   },  // sea-glass teal
+    { max:  650000, color: '#c9b87a', label: '$450K – $650K' },  // antique brass
+    { max:  850000, color: '#c4883c', label: '$650K – $850K' },  // burnished amber
+    { max: 1100000, color: '#9e5045', label: '$850K – $1.1M' },  // terracotta garnet
+    { max: Infinity, color: '#5c2e42', label: 'Over $1.1M'   },  // bordeaux
+  ];
+
+  function priceColor(price) {
+    if (price == null || !Number.isFinite(Number(price))) return '#aaaaaa';
+    const p = Number(price);
+    for (const tier of PRICE_TIERS) {
+      if (p < tier.max) return tier.color;
+    }
+    return PRICE_TIERS[PRICE_TIERS.length - 1].color;
+  }
+
+  function medianPrice(units) {
+    const prices = units
+      .map((u) => u.approvedPricing)
+      .filter((p) => p != null && Number.isFinite(Number(p)))
+      .map(Number)
+      .sort((a, b) => a - b);
+    if (!prices.length) return null;
+    const mid = Math.floor(prices.length / 2);
+    return prices.length % 2 ? prices[mid] : (prices[mid - 1] + prices[mid]) / 2;
+  }
+
+  const targets = {
+    PGD: { lat: 26.9189, lng: -81.9908, city: 'Punta Gorda' },
+    SRQ: { lat: 27.3956, lng: -82.5544, city: 'Sarasota' },
+  };
+
+  let currentAirport = 'PGD';
+  let airportDb = {};
+  let airportDbByIcao = {};
+  let areaCodeDb = {};
+  let rawBuyerData = [];
+  let lastFlights = [];
+  let inventoryAll = [];
+  let listedByComm = {};
+  let secretByComm = {};
+  const nominatimCache = {};
+  // null = show all tiers; Set of tier indices = show only those
+  let activePriceTiers = null;
+  let map;
+  const flightGroup = L.layerGroup();
+  const buyerGroup = L.layerGroup();
+  const listedGroup = L.layerGroup();
+  const secretGroup = L.layerGroup();
+
+  const el = (id) => document.getElementById(id);
+
+  function fmtMoney(n) {
+    if (n == null || !Number.isFinite(Number(n))) return '—';
+    return '$' + Math.round(Number(n)).toLocaleString('en-US');
+  }
+
+  function sleep(ms) {
+    return new Promise((r) => setTimeout(r, ms));
+  }
+
+  function stripForGeocode(communityName) {
+    if (!communityName) return '';
+    const s = String(communityName).trim();
+    const m = s.match(/^([^\-–—]+)/);
+    return (m ? m[1] : s).trim();
+  }
+
+  // geocodeHints[communityName] = specific address string from server (more reliable than name)
+  const geocodeHints = {};
+
+  // Last-resort coordinate table for known Pulte communities.
+  // Keyed by the "base" name (strip after first hyphen, lower-case).
+  // Used when the server hasn't been restarted yet and Nominatim can't find new-build names.
+  const COORD_FALLBACK = {
+    'avenir':            { lat: 26.8430, lon: -80.2020 },  // Palm Beach Gardens
+    'bridgewater':       { lat: 26.9340, lon: -80.0950 },  // Jupiter
+    'camellia':          { lat: 27.1470, lon: -80.2700 },  // Stuart
+    'costa pointe':      { lat: 27.6380, lon: -80.3970 },  // Vero Beach
+    'cottage district':  { lat: 27.2530, lon: -80.4520 },  // Port St. Lucie / Tradition
+    'del webb tradition':{ lat: 27.2480, lon: -80.4460 },  // Port St. Lucie
+    'dw @ tradition':    { lat: 27.2480, lon: -80.4460 },  // same
+    'eastpointe':        { lat: 26.8290, lon: -80.1260 },  // Palm Beach Gardens
+    'everton':           { lat: 26.5802, lon: -80.0540 },  // Lantana
+    'greyhawk landing':  { lat: 26.5940, lon: -80.1330 },  // Lake Worth
+    'harbor isle':       { lat: 27.6360, lon: -80.3990 },  // Vero Beach
+    'hendrix reserve':   { lat: 26.5963, lon: -80.1302 },  // Lake Worth
+    'highpointe':        { lat: 27.1580, lon: -80.2520 },  // Stuart
+    'marigold':          { lat: 26.0765, lon: -80.2521 },  // Davie
+  };
+
+  async function nominatimQuery(q) {
+    try {
+      const url =
+        'https://nominatim.openstreetmap.org/search?format=json&countrycodes=us&limit=3' +
+        '&viewbox=-87.63,24.40,-80.03,31.00&bounded=0' +
+        '&q=' + encodeURIComponent(q);
+      const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+      const data = await res.json();
+      if (!Array.isArray(data) || !data.length) return null;
+      // prefer a Florida result
+      const hit = data.find((r) => /florida/i.test(r.display_name)) || data[0];
+      return { lat: parseFloat(hit.lat), lon: parseFloat(hit.lon) };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async function geocodeCommunity(name) {
+    if (!name) return null;
+    if (nominatimCache[name] !== undefined) return nominatimCache[name];
+
+    // ── 1. Client-side hardcoded fallback (new construction, not in Nominatim) ──
+    const base = stripForGeocode(name).toLowerCase();
+    // Try progressively shorter keys: full base, then each trailing word stripped
+    const baseVariants = [base];
+    {
+      const parts = base.split(/\s+/);
+      for (let i = parts.length - 1; i >= 1; i--) {
+        baseVariants.push(parts.slice(0, i).join(' '));
+      }
+    }
+    for (const v of baseVariants) {
+      if (COORD_FALLBACK[v]) {
+        nominatimCache[name] = COORD_FALLBACK[v];
+        console.log('[coords fallback]', name, '←', v);
+        return COORD_FALLBACK[v];
+      }
+    }
+
+    // ── 2. Try Nominatim with hint string or community base name ──
+    const queries = [];
+    if (geocodeHints[name]) queries.push(geocodeHints[name]);
+    queries.push(base + ', Florida, USA');
+    queries.push(base + ', FL');
+
+    for (const q of queries) {
+      if (!q) continue;
+      const result = await nominatimQuery(q);
+      if (result) {
+        nominatimCache[name] = result;
+        console.log('[geocode OK]', name, '←', q);
+        return result;
+      }
+      await sleep(180);
+    }
+
+    console.warn('[geocode fail]', name);
+    nominatimCache[name] = null;
+    return null;
+  }
+
+
+  function adm0Code(feature) {
+    const p = feature.properties || {};
+    return p.ADM0_A3 || p.adm0_a3 || p.ISO_A3 || p.iso_a3 || '';
+  }
+
+  async function loadBoundaryOutlines(boundaryGroup) {
+    const neBase = 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson';
+    const countryStyle = { color: '#0d1f33', weight: 2.75, opacity: 1, fillOpacity: 0, lineJoin: 'round', lineCap: 'round' };
+    const stateStyle = { color: '#1c4b82', weight: 1.65, opacity: 0.92, fillOpacity: 0, lineJoin: 'round', lineCap: 'round' };
+    try {
+      const [cRes, sRes] = await Promise.all([
+        fetch(neBase + '/ne_110m_admin_0_countries.geojson'),
+        fetch(neBase + '/ne_110m_admin_1_states_provinces.geojson'),
+      ]);
+      if (!cRes.ok || !sRes.ok) throw new Error('Natural Earth fetch failed');
+      const countries = await cRes.json();
+      const usaCountry = { type: 'FeatureCollection', features: countries.features.filter((f) => adm0Code(f) === 'USA') };
+      L.geoJSON(usaCountry, { style: () => countryStyle, interactive: false }).addTo(boundaryGroup);
+      const admin1 = await sRes.json();
+      const usStates = { type: 'FeatureCollection', features: admin1.features.filter((f) => adm0Code(f) === 'USA') };
+      L.geoJSON(usStates, { style: () => stateStyle, interactive: false }).addTo(boundaryGroup);
+    } catch (e) {
+      console.warn('Boundary outlines unavailable', e);
+    }
+  }
+
+  function resolveDepartureAirport(flight) {
+    const dep = flight.departure;
+    if (!dep) return null;
+    const iata = dep.iata && String(dep.iata).trim();
+    if (iata && airportDb[iata]) return { apt: airportDb[iata], code: iata };
+    const icao = dep.icao && String(dep.icao).trim().toUpperCase();
+    if (icao && airportDbByIcao[icao]) {
+      const apt = airportDbByIcao[icao];
+      return { apt, code: apt.iata || icao };
+    }
+    return null;
+  }
+
+  function updateFlightStatsDom(flights, origins) {
+    el('count-flights-layer').textContent = flights.length;
+    el('stat-flights').textContent = flights.length;
+    el('flights-stat-line').textContent = flights.length + ' Flights | ' + origins + ' Origins';
+  }
+
+  function renderFlightList(flights) {
+    const box = el('flight-list');
+    box.innerHTML = '';
+    flights.forEach((flight) => {
+      const resolved = resolveDepartureAirport(flight);
+      const dep = flight.departure || {};
+      const code = resolved ? resolved.code : (dep.iata || dep.icao || '—');
+      const city = dep.city || (resolved && resolved.apt && resolved.apt.name) || 'Unknown';
+      const status = flight.flight_status || flight.status || '—';
+      const div = document.createElement('div');
+      div.className = 'flight-item';
+      div.innerHTML = '<b>' + city + '</b> (' + code + ')<br><span style="color:#666;font-size:12px;">Status: ' + status + '</span>';
+      box.appendChild(div);
+    });
+  }
+
+  function drawFlights(flights) {
+    flightGroup.clearLayers();
+    const target = targets[currentAirport];
+    L.circleMarker([target.lat, target.lng], {
+      color: '#fff',
+      fillColor: COLORS.orangeDest,
+      fillOpacity: 1,
+      radius: 8,
+      weight: 2,
+    }).addTo(flightGroup).bindPopup('<b>' + target.city + ' (' + currentAirport + ')</b>');
+
+    const origins = new Set();
+    flights.forEach((flight) => {
+      const resolved = resolveDepartureAirport(flight);
+      if (!resolved) return;
+      const { apt: depApt, code: depCode } = resolved;
+      origins.add(depCode);
+      const startLat = parseFloat(depApt.lat);
+      const startLng = parseFloat(depApt.lon);
+      const depName = (flight.departure && flight.departure.airport) || depApt.name || 'Origin';
+
+      L.circleMarker([startLat, startLng], {
+        color: '#fff',
+        fillColor: COLORS.originBlue,
+        fillOpacity: 0.85,
+        radius: 5,
+        weight: 1,
+      }).addTo(flightGroup).bindPopup(depName + ' (' + depCode + ')');
+
+      L.polyline([[startLat, startLng], [target.lat, target.lng]], {
+        color: COLORS.routeBlue,
+        weight: 2,
+        opacity: 0.75,
+        dashArray: '5, 10',
+      }).addTo(flightGroup);
+
+      const planeIcon = L.divIcon({
+        className: 'plane-icon',
+        html: '<div style="font-size:16px;transform:rotate(-45deg);">✈️</div>',
+        iconSize: [20, 20],
+      });
+      L.marker([(startLat + target.lat) / 2, (startLng + target.lng) / 2], { icon: planeIcon }).addTo(flightGroup);
+    });
+
+    updateFlightStatsDom(flights, origins.size);
+    renderFlightList(flights);
+  }
+
+  async function fetchFlights() {
+    try {
+      const res = await fetch('/api/inbound?airport=' + encodeURIComponent(currentAirport));
+      const json = await res.json();
+      const flights = json.data || [];
+      lastFlights = flights;
+      drawFlights(flights);
+      console.log('Layer flights loaded:', flights.length);
+    } catch (e) {
+      console.error('Flights fetch failed', e);
+      lastFlights = [];
+      drawFlights([]);
+      console.log('Layer flights loaded:', 0);
+    }
+  }
+
+  function renderBuyers() {
+    buyerGroup.clearLayers();
+    const agg = {};
+    rawBuyerData.forEach((b) => {
+      const ac = b.ac;
+      if (!agg[ac]) agg[ac] = { total: 0, comms: {} };
+      agg[ac].total++;
+      const cName = b.community || 'Unknown';
+      agg[ac].comms[cName] = (agg[ac].comms[cName] || 0) + 1;
+    });
+
+    let markerCount = 0;
+    Object.entries(agg).forEach(([ac, data]) => {
+      const info = areaCodeDb[ac];
+      if (!info || info.lat == null || info.lon == null) return;
+      markerCount++;
+      const count = data.total;
+      const r = Math.min(30, 4 + Math.log(count) * 3);
+      const sortedComms = Object.entries(data.comms).sort((a, b) => b[1] - a[1]);
+      let popupContent =
+        '<div style="text-align:center;min-width:150px;"><b>' +
+        (info.city || 'Area ' + ac) +
+        '</b><br><span style="font-size:16px;font-weight:bold;color:#2b8a3e">' +
+        count +
+        '</span><br><span style="font-size:10px;color:#666">Area Code ' +
+        ac +
+        '</span><hr style="margin:5px 0;border:0;border-top:1px solid #eee;">';
+      popupContent += '<div style="max-height:100px;overflow-y:auto;text-align:left;font-size:11px;">';
+      sortedComms.forEach(([name, num]) => {
+        popupContent +=
+          '<div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="color:#444;">' +
+          name +
+          '</span><strong style="color:#2b8a3e;">' +
+          num +
+          '</strong></div>';
+      });
+      popupContent += '</div></div>';
+
+      L.circleMarker([info.lat, info.lon], {
+        color: '#2b8a3e',
+        fillColor: COLORS.green,
+        fillOpacity: 0.6,
+        radius: r,
+        weight: 1,
+      })
+        .bindPopup(popupContent)
+        .addTo(buyerGroup);
+    });
+
+    el('count-buyers-layer').textContent = markerCount;
+    const mkt = Object.keys(agg).filter((ac) => areaCodeDb[ac]).length;
+    el('stat-markets').textContent = mkt;
+  }
+
+  async function fetchBuyers() {
+    try {
+      const res = await fetch('/api/buyers');
+      rawBuyerData = await res.json();
+      renderBuyers();
+      console.log('Layer buyers loaded:', rawBuyerData.length);
+    } catch (e) {
+      console.error('Buyers fetch failed', e);
+      rawBuyerData = [];
+      renderBuyers();
+      console.log('Layer buyers loaded:', 0);
+    }
+  }
+
+  function groupInventoryUnits(list) {
+    const by = {};
+    list.forEach((u) => {
+      const name = u.communityName || 'Unknown';
+      if (!by[name]) by[name] = [];
+      by[name].push(u);
+    });
+    return by;
+  }
+
+  function inventoryPopupListed(name, units) {
+    const prices = units.map((u) => u.approvedPricing).filter((p) => p != null && Number.isFinite(p));
+    const minP = prices.length ? Math.min.apply(null, prices) : null;
+    const maxP = prices.length ? Math.max.apply(null, prices) : null;
+    const stages = [...new Set(units.map((u) => String(u.constructionStage || '').trim()).filter(Boolean))];
+    const financing = units.some((u) => String(u.forwardCommitmentAvailable || '').trim().toUpperCase() === 'Y');
+    let html = '<div style="min-width:200px;"><b style="color:#0D1B2A;">' + name + '</b><br>';
+    html += '<span>' + units.length + ' units available</span><br>';
+    if (minP != null && maxP != null) {
+      html += '<span style="font-size:12px;color:#444;">Price: ' + fmtMoney(minP) + ' – ' + fmtMoney(maxP) + '</span><br>';
+    }
+    if (stages.length) html += '<span style="font-size:11px;color:#666;">Stages: ' + stages.join(', ') + '</span><br>';
+    html += '<span style="font-size:11px;color:#666;">Financing: ' + (financing ? 'Y' : 'N') + '</span></div>';
+    return html;
+  }
+
+  function inventoryPopupSecret(name, count) {
+    return (
+      '<div style="min-width:220px;">🔒 <strong>' +
+      count +
+      '</strong> unlisted units at <strong>' +
+      name +
+      '</strong><br><span style="font-size:12px;color:#444;">These units are not publicly listed. Contact your OA Agent to unlock details.</span></div>'
+    );
+  }
+
+  function openDetailPanel(communityName, units) {
+    const panel = el('detail-panel');
+    const backdrop = el('detail-backdrop');
+    el('detail-title').textContent = communityName;
+    el('detail-count').textContent = units.length + ' unit' + (units.length !== 1 ? 's' : '');
+    const scroll = el('detail-scroll');
+    scroll.innerHTML = '';
+
+    units.forEach((u) => {
+      const stageRaw = String(u.constructionStage || '').toLowerCase();
+      let stageClass = 'stage-other';
+      if (stageRaw.includes('start')) stageClass = 'stage-start';
+      else if (stageRaw.includes('second')) stageClass = 'stage-second';
+      else if (stageRaw.includes('final')) stageClass = 'stage-final';
+
+      const pct = u.totalInBrokerSalesCommissionPct;
+      const coop =
+        pct != null && Number.isFinite(Number(pct))
+          ? Math.round(Number(pct)) + '% CO-OP'
+          : 'CO-OP';
+
+      const card = document.createElement('div');
+      card.className = 'unit-card';
+      let inner = '<div class="plan">' + (u.plan || 'Plan') + '</div>';
+      inner += '<div class="lot">Lot ' + (u.lot != null ? u.lot : '—') + '</div>';
+      inner += '<span class="stage-badge ' + stageClass + '">' + (u.constructionStage || 'Stage') + '</span>';
+
+      inner += '<div class="price-line"><span>Base Price</span><span>' + fmtMoney(u.basePrice) + '</span></div>';
+      inner += '<div class="price-line"><span>Options</span><span>+' + fmtMoney(u.optionPrice) + '</span></div>';
+      inner += '<div class="price-line"><span>Lot Premium</span><span>+' + fmtMoney(u.lotPremium) + '</span></div>';
+      inner += '<div class="price-line total"><span>Approved Price</span><span>' + fmtMoney(u.approvedPricing) + '</span></div>';
+
+      const pub = Number(u.publishedIncentive) || 0;
+      if (pub > 0) {
+        inner += '<div class="incentive-badge">SAVE ' + fmtMoney(pub) + '</div>';
+      }
+      const pmc = Number(u.pmcClosingCosts) || 0;
+      if (pmc > 0) {
+        inner += '<div class="fin-line">🏦 ' + fmtMoney(pmc) + ' closing cost assistance</div>';
+      }
+      if (String(u.forwardCommitmentAvailable || '').trim().toUpperCase() === 'Y') {
+        inner +=
+          '<div class="fin-line">💰 ' + (u.forwardCommitmentRate != null ? String(u.forwardCommitmentRate) : 'Forward commitment') + '</div>';
+      }
+
+      inner += '<div class="coop-badge">' + coop + '</div>';
+      if (u.isSecret) {
+        inner += '<div class="unlisted-badge">🔒 UNLISTED</div>';
+      }
+
+      card.innerHTML = inner;
+      scroll.appendChild(card);
+    });
+
+    panel.classList.add('open');
+    panel.setAttribute('aria-hidden', 'false');
+    backdrop.classList.add('open');
+  }
+
+  function closeDetailPanel() {
+    const panel = el('detail-panel');
+    const backdrop = el('detail-backdrop');
+    panel.classList.remove('open');
+    panel.setAttribute('aria-hidden', 'true');
+    backdrop.classList.remove('open');
+  }
+
+  function addInventoryMarkers(mapByComm, isSecret) {
+    const group = isSecret ? secretGroup : listedGroup;
+    group.clearLayers();
+    Object.entries(mapByComm).forEach(([name, units]) => {
+      const coord = nominatimCache[name];
+      if (!coord || coord.lat == null) return;
+      const med = medianPrice(units);
+      const tierIdx = PRICE_TIERS.findIndex((t) => med != null && Number(med) < t.max);
+      // Apply active-tier filter
+      if (activePriceTiers !== null && !activePriceTiers.has(tierIdx)) return;
+      const n = units.length;
+      const r = Math.min(40, 8 + n * 3);
+      const fillColor = PRICE_TIERS[tierIdx >= 0 ? tierIdx : PRICE_TIERS.length - 1]?.color || '#aaa';
+      const borderColor = isSecret ? COLORS.gold : '#ffffff';
+      const borderWeight = isSecret ? 3 : 2;
+      const popupHtml = isSecret ? inventoryPopupSecret(name, n) : inventoryPopupListed(name, units);
+      const circle = L.circleMarker([coord.lat, coord.lon], {
+        color: borderColor,
+        fillColor,
+        fillOpacity: 0.85,
+        radius: r,
+        weight: borderWeight,
+      })
+        .bindPopup(popupHtml)
+        .addTo(group);
+      circle.on('click', () => openDetailPanel(name, units));
+    });
+  }
+
+  function filterInventoryRows() {
+    const minP = Number(el('min-price').value);
+    const maxP = Number(el('max-price').value);
+    const stage = el('filter-stage').value;
+    const secretOnly = el('filter-secret-only').checked;
+
+    return inventoryAll.filter((u) => {
+      const price = u.approvedPricing;
+      if (price != null && Number.isFinite(Number(price))) {
+        if (Number(price) < minP || Number(price) > maxP) return false;
+      }
+      if (secretOnly && !u.isSecret) return false;
+      const s = String(u.constructionStage || '').toLowerCase();
+      if (stage === 'start' && !s.includes('start')) return false;
+      if (stage === 'second' && !s.includes('second')) return false;
+      if (stage === 'final' && !s.includes('final')) return false;
+      return true;
+    });
+  }
+
+  function renderInventoryCards() {
+    const rows = filterInventoryRows();
+    const by = groupInventoryUnits(rows);
+    const host = el('inventory-cards');
+    host.innerHTML = '';
+    Object.entries(by).forEach(([name, units]) => {
+      const prices = units.map((u) => u.approvedPricing).filter((p) => p != null && Number.isFinite(p));
+      const minPrice = prices.length ? Math.min.apply(null, prices) : null;
+      const maxPrice = prices.length ? Math.max.apply(null, prices) : null;
+      const med = medianPrice(units);
+      const dotColor = priceColor(med);
+      const hasSecret = units.some((u) => u.isSecret);
+      const card = document.createElement('div');
+      card.className = 'comm-card';
+      card.innerHTML =
+        '<div style="display:flex;align-items:center;gap:8px">' +
+        '<span style="width:12px;height:12px;border-radius:50%;background:' + dotColor + ';flex-shrink:0;' +
+          (hasSecret ? 'border:2px solid ' + COLORS.gold + ';' : 'border:2px solid #fff;') +
+          'box-shadow:0 1px 3px rgba(0,0,0,.3)"></span>' +
+        '<h4 style="margin:0;flex:1">' + name + '</h4>' +
+        (hasSecret ? '<span class="secret-pill">SECRET</span>' : '') +
+        '</div>' +
+        '<div class="meta">' + units.length + ' units' +
+        (minPrice != null ? ' · ' + fmtMoney(minPrice) + '–' + fmtMoney(maxPrice) : '') +
+        '</div>';
+      card.addEventListener('click', () => {
+        const coord = nominatimCache[name];
+        if (coord && coord.lat) {
+          map.flyTo([coord.lat, coord.lon], 11, { duration: 1.2 });
+        }
+        openDetailPanel(name, units);
+      });
+      host.appendChild(card);
+    });
+  }
+
+  async function fetchInventory() {
+    try {
+      const res = await fetch('/api/inventory/pulte');
+      inventoryAll = await res.json();
+      if (!Array.isArray(inventoryAll)) inventoryAll = [];
+
+      const listed = inventoryAll.filter((u) => u.isSecret === false);
+      const secret = inventoryAll.filter((u) => u.isSecret === true);
+      listedByComm = groupInventoryUnits(listed);
+      secretByComm = groupInventoryUnits(secret);
+
+      el('stat-listed').textContent = listed.length;
+      el('stat-secret').textContent = secret.length;
+      el('count-listed-layer').textContent = listed.length;
+      el('count-secret-layer').textContent = secret.length;
+
+      // ── Pass 1: seed cache from server-provided coords & build geocodeHints ──
+      const allComms = [...new Set([
+        ...Object.keys(listedByComm),
+        ...Object.keys(secretByComm),
+      ])];
+
+      const needsGeocode = [];
+      allComms.forEach((name) => {
+        const units = (listedByComm[name] || []).concat(secretByComm[name] || []);
+        const first = units[0] || {};
+        if (first.lat != null && first.lon != null) {
+          nominatimCache[name] = { lat: first.lat, lon: first.lon };
+          console.log('[coords direct]', name);
+        } else {
+          if (first.geocodeQuery) geocodeHints[name] = first.geocodeQuery;
+          needsGeocode.push(name);
+        }
+      });
+
+      // ── Pass 2: draw markers for communities we already have coords for ──
+      addInventoryMarkers(listedByComm, false);
+      addInventoryMarkers(secretByComm, true);
+      renderInventoryCards();
+      console.log('Layer listed inventory loaded:', listed.length);
+      console.log('Layer secret inventory loaded:', secret.length);
+
+      // ── Pass 3: geocode the rest progressively, redraw as each resolves ──
+      if (needsGeocode.length) {
+        console.log('[inventory] geocoding', needsGeocode.length, 'communities via Nominatim');
+        for (const name of needsGeocode) {
+          await geocodeCommunity(name);
+          // Redraw both groups so the new marker appears right away
+          addInventoryMarkers(listedByComm, false);
+          addInventoryMarkers(secretByComm, true);
+          await sleep(200);
+        }
+      }
+
+    } catch (e) {
+      console.error('Inventory fetch failed', e);
+      inventoryAll = [];
+      listedByComm = {};
+      secretByComm = {};
+      el('stat-listed').textContent = '0';
+      el('stat-secret').textContent = '0';
+      el('count-listed-layer').textContent = '0';
+      el('count-secret-layer').textContent = '0';
+    }
+  }
+
+  function applyLayerToggles() {
+    if (el('tog-flights').checked) map.addLayer(flightGroup);
+    else map.removeLayer(flightGroup);
+    if (el('tog-buyers').checked) map.addLayer(buyerGroup);
+    else map.removeLayer(buyerGroup);
+    if (el('tog-listed').checked) map.addLayer(listedGroup);
+    else map.removeLayer(listedGroup);
+    if (el('tog-secret').checked) map.addLayer(secretGroup);
+    else map.removeLayer(secretGroup);
+  }
+
+  function syncAirportButtons() {
+    document.querySelectorAll('.air-toggle-btn').forEach((btn) => {
+      const a = btn.getAttribute('data-air');
+      btn.classList.toggle('active', a === currentAirport);
+    });
+  }
+
+  function setAirport(code) {
+    currentAirport = code;
+    syncAirportButtons();
+    fetchFlights();
+  }
+
+  function collectNumericLeaves(obj, prefix, out, depth) {
+    if (depth > 4 || obj == null) return;
+    if (typeof obj === 'number' && Number.isFinite(obj)) {
+      out.push({ key: prefix || 'value', val: obj });
+      return;
+    }
+    if (typeof obj !== 'object') return;
+    if (Array.isArray(obj)) {
+      obj.forEach((item, i) => collectNumericLeaves(item, prefix + '[' + i + ']', out, depth + 1));
+      return;
+    }
+    Object.keys(obj).forEach((k) => {
+      const v = obj[k];
+      const p = prefix ? prefix + '.' + k : k;
+      if (typeof v === 'number' && Number.isFinite(v)) out.push({ key: p, val: v });
+      else if (typeof v === 'object' && v !== null) collectNumericLeaves(v, p, out, depth + 1);
+    });
+  }
+
+  async function fetchMarket() {
+    const box = el('market-content');
+    box.innerHTML = '<div class="spinner"></div>';
+    try {
+      const res = await fetch('/api/parcl/inventory/2900279');
+      const data = await res.json();
+      const nums = [];
+      collectNumericLeaves(data, '', nums, 0);
+      if (!nums.length) {
+        box.innerHTML = '<p class="market-unavailable">No numeric metrics in response.</p>';
+        return;
+      }
+      const grid = document.createElement('div');
+      grid.className = 'market-grid';
+      nums.slice(0, 24).forEach(({ key, val }) => {
+        const card = document.createElement('div');
+        card.className = 'market-card';
+        card.innerHTML = '<div class="v">' + val.toLocaleString('en-US', { maximumFractionDigits: 2 }) + '</div><div class="k">' + key + '</div>';
+        grid.appendChild(card);
+      });
+      box.innerHTML = '';
+      box.appendChild(grid);
+    } catch (e) {
+      console.error('Market fetch failed', e);
+      box.innerHTML = '<p class="market-unavailable">Market data unavailable</p>';
+    }
+  }
+
+  /* Tabs */
+  document.querySelectorAll('.nav-tab').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tab = btn.getAttribute('data-tab');
+      document.querySelectorAll('.nav-tab').forEach((b) => b.classList.toggle('active', b === btn));
+      document.querySelectorAll('.tab-panel').forEach((p) => {
+        p.classList.toggle('active', p.getAttribute('data-panel') === tab);
+      });
+      if (tab === 'market' && !el('market-content').dataset.loaded) {
+        el('market-content').dataset.loaded = '1';
+        fetchMarket();
+      }
+    });
+  });
+
+  document.querySelectorAll('.switch[data-layer]').forEach((sw) => {
+    sw.addEventListener('change', applyLayerToggles);
+  });
+
+  function bindAirportToggle(root) {
+    root.querySelectorAll('.air-toggle-btn').forEach((btn) => {
+      btn.addEventListener('click', () => setAirport(btn.getAttribute('data-air')));
+    });
+  }
+  bindAirportToggle(el('layers-airport-toggle'));
+  bindAirportToggle(el('flights-airport-toggle'));
+
+  el('btn-refresh-flights').addEventListener('click', () => fetchFlights());
+  el('detail-close').addEventListener('click', closeDetailPanel);
+  el('detail-backdrop').addEventListener('click', closeDetailPanel);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDetailPanel(); });
+
+  function updatePriceLabels() {
+    el('min-price-label').textContent = fmtMoney(el('min-price').value);
+    el('max-price-label').textContent = fmtMoney(el('max-price').value);
+  }
+  ['min-price', 'max-price', 'filter-stage', 'filter-secret-only'].forEach((id) => {
+    el(id).addEventListener('input', () => {
+      updatePriceLabels();
+      renderInventoryCards();
+    });
+    el(id).addEventListener('change', () => {
+      updatePriceLabels();
+      renderInventoryCards();
+    });
+  });
+  updatePriceLabels();
+
+  /* OA widget — TODO: replace keyword routing with Claude API for natural language */
+  const oaFab = el('oa-fab');
+  const oaPanel = el('oa-panel');
+  const oaClose = el('oa-close');
+  const oaMessages = el('oa-messages');
+  const oaInput = el('oa-input');
+  const oaSend = el('oa-send');
+  let oaOpenedOnce = false;
+
+  function pushOa(text, who) {
+    const d = document.createElement('div');
+    d.className = 'oa-msg ' + (who === 'user' ? 'user' : 'bot');
+    d.textContent = text;
+    oaMessages.appendChild(d);
+    oaMessages.scrollTop = oaMessages.scrollHeight;
+  }
+
+  function oaReply(userText) {
+    const t = userText.toLowerCase();
+    if (/budget|price|\$|cost/.test(t)) {
+      return 'We regularly see new construction in Southwest Florida from the high $200s into seven figures depending on community and builder incentives. Tell me your target band and I will narrow options — including pockets others do not advertise.';
+    }
+    if (/secret|unlisted|hidden|pocket|off\s*mls/.test(t)) {
+      return 'Metastate maintains off-market and "House Cube" inventory that never hits public search. Your OA can brief you on count, stage, and timing under confidentiality.';
+    }
+    if (/pulte|lennar|dr\s*horton|taylor|beazer|kb\s*homes?/i.test(t)) {
+      return 'We track major production builders across Charlotte, Sarasota, and Lee counties — Pulte included — with live pricing and incentive schedules. Which communities are on your short list?';
+    }
+    if (/timeline|when|ready|close|completion|stage/.test(t)) {
+      return 'Inventory spans dirt-start through certificate of occupancy. Share whether you need fast move-in or can wait on construction, and I will filter by stage.';
+    }
+    if (/tour|visit|showing|see|fly|trip/.test(t)) {
+      return 'Many clients pair aerial Allegiant markets with a ground tour — including Sunseeker-adjacent corridors. We can line up model visits and spec walkthroughs around your travel dates.';
+    }
+    return 'Let me connect you with our team at info@metastaterealty.com for a tailored brief.';
+  }
+
+  oaFab.addEventListener('click', () => {
+    oaPanel.classList.add('open');
+    if (!oaOpenedOnce) {
+      oaOpenedOnce = true;
+      pushOa(
+        "Hi! I'm your OA — Outside Agent for Southwest Florida new construction. I have access to both listed AND unlisted inventory across all builders. What's your budget range?",
+        'bot'
+      );
+    }
+  });
+  oaClose.addEventListener('click', () => oaPanel.classList.remove('open'));
+  function sendOa() {
+    const v = (oaInput.value || '').trim();
+    if (!v) return;
+    pushOa(v, 'user');
+    oaInput.value = '';
+    pushOa(oaReply(v), 'bot');
+  }
+  oaSend.addEventListener('click', sendOa);
+  oaInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendOa();
+  });
+
+  /* Map init */
+  map = L.map('map', { zoomControl: false, center: [27.5, -82], zoom: 7 });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap &copy; CARTO',
+    subdomains: 'abcd',
+    maxZoom: 20,
+  }).addTo(map);
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
+  const boundaryGroup = L.layerGroup().addTo(map);
+  loadBoundaryOutlines(boundaryGroup);
+
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      try { map.invalidateSize(); } catch (err) {}
+    }, 120);
+  });
+
+  /* Load static DBs then APIs */
+  (async function boot() {
+    // Render price legend chips from the PRICE_TIERS constant
+    const chipsHost = el('price-legend-chips');
+    if (chipsHost) {
+      chipsHost.innerHTML = PRICE_TIERS.map((t, i) =>
+        '<div class="legend-chip" data-tier="' + i + '">' +
+        '<span class="legend-swatch" style="background:' + t.color + '"></span>' +
+        t.label +
+        '</div>'
+      ).join('');
+
+      chipsHost.addEventListener('click', (e) => {
+        const chip = e.target.closest('.legend-chip');
+        if (!chip) return;
+        const idx = Number(chip.dataset.tier);
+        if (activePriceTiers === null) {
+          // First click — activate only this tier
+          activePriceTiers = new Set([idx]);
+        } else if (activePriceTiers.has(idx)) {
+          activePriceTiers.delete(idx);
+          if (activePriceTiers.size === 0) activePriceTiers = null; // back to show-all
+        } else {
+          activePriceTiers.add(idx);
+        }
+        // Sync chip styles
+        chipsHost.querySelectorAll('.legend-chip').forEach((c) => {
+          const ti = Number(c.dataset.tier);
+          const active = activePriceTiers === null || activePriceTiers.has(ti);
+          c.style.opacity = active ? '1' : '0.28';
+          c.style.transform = active ? 'translateX(0)' : 'translateX(-4px)';
+          c.style.fontWeight = (activePriceTiers !== null && activePriceTiers.has(ti)) ? '700' : '';
+        });
+        // Redraw markers with new filter
+        addInventoryMarkers(listedByComm, false);
+        addInventoryMarkers(secretByComm, true);
+        renderInventoryCards();
+      });
+    }
+    try {
+      const [airResp, acResp] = await Promise.all([fetch('airports.json'), fetch('area-codes.json')]);
+      const airData = await airResp.json();
+      Object.values(airData).forEach((apt) => {
+        if (apt.iata) airportDb[apt.iata] = apt;
+        if (apt.icao) airportDbByIcao[String(apt.icao).toUpperCase()] = apt;
+      });
+      const acData = await acResp.json();
+      acData.forEach((item) => {
+        areaCodeDb[String(item.code)] = item;
+      });
+    } catch (e) {
+      console.error('Airports / area codes load failed', e);
+    }
+
+    // Flights & buyers resolve quickly; show them right away.
+    // Inventory does its own progressive rendering internally.
+    await Promise.all([fetchFlights(), fetchBuyers()]);
+    applyLayerToggles();
+    try { map.invalidateSize(); } catch (e) {}
+    // Inventory runs in parallel — markers appear progressively as geocoding resolves
+    fetchInventory();
+  })();
+})();
+  </script>
+</body>
+</html>

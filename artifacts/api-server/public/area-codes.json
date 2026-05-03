@@ -1,0 +1,1814 @@
+[
+    {
+        "code": "201",
+        "lat": 40.79,
+        "lon": -74.02,
+        "city": "Jersey City, NJ"
+    },
+    {
+        "code": "202",
+        "lat": 38.89,
+        "lon": -77.03,
+        "city": "Washington, DC"
+    },
+    {
+        "code": "203",
+        "lat": 41.31,
+        "lon": -72.92,
+        "city": "New Haven, CT"
+    },
+    {
+        "code": "205",
+        "lat": 33.52,
+        "lon": -86.80,
+        "city": "Birmingham, AL"
+    },
+    {
+        "code": "206",
+        "lat": 47.61,
+        "lon": -122.33,
+        "city": "Seattle, WA"
+    },
+    {
+        "code": "209",
+        "lat": 37.95,
+        "lon": -121.29,
+        "city": "Stockton, CA"
+    },
+    {
+        "code": "210",
+        "lat": 29.42,
+        "lon": -98.49,
+        "city": "San Antonio, TX"
+    },
+    {
+        "code": "212",
+        "lat": 40.71,
+        "lon": -74.00,
+        "city": "New York, NY"
+    },
+    {
+        "code": "213",
+        "lat": 34.05,
+        "lon": -118.24,
+        "city": "Los Angeles, CA"
+    },
+    {
+        "code": "214",
+        "lat": 32.78,
+        "lon": -96.80,
+        "city": "Dallas, TX"
+    },
+    {
+        "code": "215",
+        "lat": 40.00,
+        "lon": -75.13,
+        "city": "Philadelphia, PA"
+    },
+    {
+        "code": "216",
+        "lat": 41.50,
+        "lon": -81.69,
+        "city": "Cleveland, OH"
+    },
+    {
+        "code": "217",
+        "lat": 39.80,
+        "lon": -89.64,
+        "city": "Springfield, IL"
+    },
+    {
+        "code": "218",
+        "lat": 46.79,
+        "lon": -92.09,
+        "city": "Duluth, MN"
+    },
+    {
+        "code": "219",
+        "lat": 41.59,
+        "lon": -87.35,
+        "city": "Hammond, IN"
+    },
+    {
+        "code": "224",
+        "lat": 42.03,
+        "lon": -87.88,
+        "city": "Des Plaines, IL"
+    },
+    {
+        "code": "225",
+        "lat": 30.45,
+        "lon": -91.13,
+        "city": "Baton Rouge, LA"
+    },
+    {
+        "code": "228",
+        "lat": 30.37,
+        "lon": -89.09,
+        "city": "Gulfport, MS"
+    },
+    {
+        "code": "229",
+        "lat": 31.58,
+        "lon": -84.16,
+        "city": "Albany, GA"
+    },
+    {
+        "code": "231",
+        "lat": 43.23,
+        "lon": -86.25,
+        "city": "Muskegon, MI"
+    },
+    {
+        "code": "234",
+        "lat": 41.08,
+        "lon": -81.52,
+        "city": "Akron, OH"
+    },
+    {
+        "code": "239",
+        "lat": 26.64,
+        "lon": -81.87,
+        "city": "Fort Myers, FL"
+    },
+    {
+        "code": "240",
+        "lat": 39.08,
+        "lon": -77.15,
+        "city": "Rockville, MD"
+    },
+    {
+        "code": "248",
+        "lat": 42.55,
+        "lon": -83.21,
+        "city": "Troy, MI"
+    },
+    {
+        "code": "251",
+        "lat": 30.69,
+        "lon": -88.04,
+        "city": "Mobile, AL"
+    },
+    {
+        "code": "252",
+        "lat": 35.60,
+        "lon": -77.37,
+        "city": "Greenville, NC"
+    },
+    {
+        "code": "253",
+        "lat": 47.24,
+        "lon": -122.43,
+        "city": "Tacoma, WA"
+    },
+    {
+        "code": "254",
+        "lat": 31.55,
+        "lon": -97.15,
+        "city": "Waco, TX"
+    },
+    {
+        "code": "256",
+        "lat": 34.72,
+        "lon": -86.59,
+        "city": "Huntsville, AL"
+    },
+    {
+        "code": "260",
+        "lat": 41.08,
+        "lon": -85.14,
+        "city": "Fort Wayne, IN"
+    },
+    {
+        "code": "262",
+        "lat": 42.58,
+        "lon": -87.82,
+        "city": "Kenosha, WI"
+    },
+    {
+        "code": "267",
+        "lat": 40.00,
+        "lon": -75.13,
+        "city": "Philadelphia, PA"
+    },
+    {
+        "code": "269",
+        "lat": 42.29,
+        "lon": -85.59,
+        "city": "Kalamazoo, MI"
+    },
+    {
+        "code": "270",
+        "lat": 37.00,
+        "lon": -86.44,
+        "city": "Bowling Green, KY"
+    },
+    {
+        "code": "272",
+        "lat": 41.41,
+        "lon": -75.66,
+        "city": "Scranton, PA"
+    },
+    {
+        "code": "276",
+        "lat": 36.70,
+        "lon": -81.97,
+        "city": "Abingdon, VA"
+    },
+    {
+        "code": "281",
+        "lat": 29.76,
+        "lon": -95.36,
+        "city": "Houston, TX"
+    },
+    {
+        "code": "289",
+        "lat": 43.26,
+        "lon": -79.87,
+        "city": "Hamilton, ON"
+    },
+    {
+        "code": "301",
+        "lat": 39.42,
+        "lon": -77.41,
+        "city": "Frederick, MD"
+    },
+    {
+        "code": "302",
+        "lat": 39.16,
+        "lon": -75.52,
+        "city": "Dover, DE"
+    },
+    {
+        "code": "303",
+        "lat": 39.74,
+        "lon": -104.98,
+        "city": "Denver, CO"
+    },
+    {
+        "code": "304",
+        "lat": 38.35,
+        "lon": -81.63,
+        "city": "Charleston, WV"
+    },
+    {
+        "code": "305",
+        "lat": 25.77,
+        "lon": -80.19,
+        "city": "Miami, FL"
+    },
+    {
+        "code": "307",
+        "lat": 41.14,
+        "lon": -104.80,
+        "city": "Cheyenne, WY"
+    },
+    {
+        "code": "308",
+        "lat": 40.93,
+        "lon": -100.17,
+        "city": "Grand Island, NE"
+    },
+    {
+        "code": "309",
+        "lat": 40.69,
+        "lon": -89.59,
+        "city": "Peoria, IL"
+    },
+    {
+        "code": "310",
+        "lat": 34.02,
+        "lon": -118.49,
+        "city": "Santa Monica, CA"
+    },
+    {
+        "code": "312",
+        "lat": 41.88,
+        "lon": -87.63,
+        "city": "Chicago, IL"
+    },
+    {
+        "code": "313",
+        "lat": 42.33,
+        "lon": -83.05,
+        "city": "Detroit, MI"
+    },
+    {
+        "code": "314",
+        "lat": 38.63,
+        "lon": -90.20,
+        "city": "St. Louis, MO"
+    },
+    {
+        "code": "315",
+        "lat": 43.05,
+        "lon": -76.15,
+        "city": "Syracuse, NY"
+    },
+    {
+        "code": "316",
+        "lat": 37.69,
+        "lon": -97.34,
+        "city": "Wichita, KS"
+    },
+    {
+        "code": "317",
+        "lat": 39.77,
+        "lon": -86.16,
+        "city": "Indianapolis, IN"
+    },
+    {
+        "code": "318",
+        "lat": 32.52,
+        "lon": -93.75,
+        "city": "Shreveport, LA"
+    },
+    {
+        "code": "319",
+        "lat": 41.98,
+        "lon": -91.67,
+        "city": "Cedar Rapids, IA"
+    },
+    {
+        "code": "320",
+        "lat": 45.56,
+        "lon": -94.16,
+        "city": "St. Cloud, MN"
+    },
+    {
+        "code": "321",
+        "lat": 28.54,
+        "lon": -81.38,
+        "city": "Orlando, FL"
+    },
+    {
+        "code": "323",
+        "lat": 34.05,
+        "lon": -118.24,
+        "city": "Los Angeles, CA"
+    },
+    {
+        "code": "325",
+        "lat": 32.45,
+        "lon": -99.74,
+        "city": "Abilene, TX"
+    },
+    {
+        "code": "330",
+        "lat": 41.08,
+        "lon": -81.52,
+        "city": "Akron, OH"
+    },
+    {
+        "code": "331",
+        "lat": 41.76,
+        "lon": -88.32,
+        "city": "Aurora, IL"
+    },
+    {
+        "code": "334",
+        "lat": 32.36,
+        "lon": -86.28,
+        "city": "Montgomery, AL"
+    },
+    {
+        "code": "336",
+        "lat": 36.07,
+        "lon": -79.79,
+        "city": "Greensboro, NC"
+    },
+    {
+        "code": "337",
+        "lat": 30.22,
+        "lon": -92.02,
+        "city": "Lafayette, LA"
+    },
+    {
+        "code": "339",
+        "lat": 42.21,
+        "lon": -70.94,
+        "city": "Weymouth, MA"
+    },
+    {
+        "code": "341",
+        "lat": 37.80,
+        "lon": -122.27,
+        "city": "Oakland, CA"
+    },
+    {
+        "code": "346",
+        "lat": 29.76,
+        "lon": -95.36,
+        "city": "Houston, TX"
+    },
+    {
+        "code": "347",
+        "lat": 40.71,
+        "lon": -74.00,
+        "city": "New York, NY"
+    },
+    {
+        "code": "351",
+        "lat": 42.63,
+        "lon": -71.32,
+        "city": "Lowell, MA"
+    },
+    {
+        "code": "352",
+        "lat": 29.65,
+        "lon": -82.32,
+        "city": "Gainesville, FL"
+    },
+    {
+        "code": "360",
+        "lat": 45.64,
+        "lon": -122.66,
+        "city": "Vancouver, WA"
+    },
+    {
+        "code": "361",
+        "lat": 27.80,
+        "lon": -97.40,
+        "city": "Corpus Christi, TX"
+    },
+    {
+        "code": "364",
+        "lat": 36.87,
+        "lon": -87.49,
+        "city": "Hopkinsville, KY"
+    },
+    {
+        "code": "380",
+        "lat": 39.96,
+        "lon": -83.00,
+        "city": "Columbus, OH"
+    },
+    {
+        "code": "385",
+        "lat": 40.76,
+        "lon": -111.89,
+        "city": "Salt Lake City, UT"
+    },
+    {
+        "code": "386",
+        "lat": 29.21,
+        "lon": -81.02,
+        "city": "Daytona Beach, FL"
+    },
+    {
+        "code": "401",
+        "lat": 41.82,
+        "lon": -71.41,
+        "city": "Providence, RI"
+    },
+    {
+        "code": "402",
+        "lat": 41.25,
+        "lon": -95.94,
+        "city": "Omaha, NE"
+    },
+    {
+        "code": "404",
+        "lat": 33.75,
+        "lon": -84.39,
+        "city": "Atlanta, GA"
+    },
+    {
+        "code": "405",
+        "lat": 35.47,
+        "lon": -97.52,
+        "city": "Oklahoma City, OK"
+    },
+    {
+        "code": "406",
+        "lat": 46.59,
+        "lon": -112.02,
+        "city": "Helena, MT"
+    },
+    {
+        "code": "407",
+        "lat": 28.54,
+        "lon": -81.38,
+        "city": "Orlando, FL"
+    },
+    {
+        "code": "408",
+        "lat": 37.33,
+        "lon": -121.89,
+        "city": "San Jose, CA"
+    },
+    {
+        "code": "409",
+        "lat": 30.08,
+        "lon": -94.10,
+        "city": "Beaumont, TX"
+    },
+    {
+        "code": "410",
+        "lat": 39.29,
+        "lon": -76.61,
+        "city": "Baltimore, MD"
+    },
+    {
+        "code": "412",
+        "lat": 40.44,
+        "lon": -80.00,
+        "city": "Pittsburgh, PA"
+    },
+    {
+        "code": "413",
+        "lat": 42.10,
+        "lon": -72.59,
+        "city": "Springfield, MA"
+    },
+    {
+        "code": "414",
+        "lat": 43.04,
+        "lon": -87.91,
+        "city": "Milwaukee, WI"
+    },
+    {
+        "code": "415",
+        "lat": 37.77,
+        "lon": -122.42,
+        "city": "San Francisco, CA"
+    },
+    {
+        "code": "417",
+        "lat": 37.21,
+        "lon": -93.29,
+        "city": "Springfield, MO"
+    },
+    {
+        "code": "419",
+        "lat": 41.66,
+        "lon": -83.58,
+        "city": "Toledo, OH"
+    },
+    {
+        "code": "423",
+        "lat": 35.05,
+        "lon": -85.31,
+        "city": "Chattanooga, TN"
+    },
+    {
+        "code": "424",
+        "lat": 34.05,
+        "lon": -118.24,
+        "city": "Los Angeles, CA"
+    },
+    {
+        "code": "425",
+        "lat": 47.61,
+        "lon": -122.20,
+        "city": "Bellevue, WA"
+    },
+    {
+        "code": "430",
+        "lat": 32.35,
+        "lon": -95.30,
+        "city": "Tyler, TX"
+    },
+    {
+        "code": "432",
+        "lat": 32.00,
+        "lon": -102.08,
+        "city": "Midland, TX"
+    },
+    {
+        "code": "434",
+        "lat": 38.03,
+        "lon": -78.48,
+        "city": "Charlottesville, VA"
+    },
+    {
+        "code": "435",
+        "lat": 37.10,
+        "lon": -113.58,
+        "city": "St. George, UT"
+    },
+    {
+        "code": "440",
+        "lat": 41.46,
+        "lon": -82.18,
+        "city": "Lorain, OH"
+    },
+    {
+        "code": "442",
+        "lat": 33.12,
+        "lon": -117.08,
+        "city": "Escondido, CA"
+    },
+    {
+        "code": "443",
+        "lat": 39.29,
+        "lon": -76.61,
+        "city": "Baltimore, MD"
+    },
+    {
+        "code": "458",
+        "lat": 44.05,
+        "lon": -123.08,
+        "city": "Eugene, OR"
+    },
+    {
+        "code": "469",
+        "lat": 32.78,
+        "lon": -96.80,
+        "city": "Dallas, TX"
+    },
+    {
+        "code": "470",
+        "lat": 33.75,
+        "lon": -84.39,
+        "city": "Atlanta, GA"
+    },
+    {
+        "code": "475",
+        "lat": 41.22,
+        "lon": -73.06,
+        "city": "Milford, CT"
+    },
+    {
+        "code": "478",
+        "lat": 32.84,
+        "lon": -83.63,
+        "city": "Macon, GA"
+    },
+    {
+        "code": "479",
+        "lat": 35.39,
+        "lon": -94.42,
+        "city": "Fort Smith, AR"
+    },
+    {
+        "code": "480",
+        "lat": 33.42,
+        "lon": -111.94,
+        "city": "Tempe, AZ"
+    },
+    {
+        "code": "484",
+        "lat": 40.61,
+        "lon": -75.49,
+        "city": "Allentown, PA"
+    },
+    {
+        "code": "501",
+        "lat": 34.74,
+        "lon": -92.29,
+        "city": "Little Rock, AR"
+    },
+    {
+        "code": "502",
+        "lat": 38.25,
+        "lon": -85.76,
+        "city": "Louisville, KY"
+    },
+    {
+        "code": "503",
+        "lat": 45.52,
+        "lon": -122.68,
+        "city": "Portland, OR"
+    },
+    {
+        "code": "504",
+        "lat": 29.95,
+        "lon": -90.07,
+        "city": "New Orleans, LA"
+    },
+    {
+        "code": "505",
+        "lat": 35.08,
+        "lon": -106.65,
+        "city": "Albuquerque, NM"
+    },
+    {
+        "code": "507",
+        "lat": 44.02,
+        "lon": -92.46,
+        "city": "Rochester, MN"
+    },
+    {
+        "code": "508",
+        "lat": 42.26,
+        "lon": -71.80,
+        "city": "Worcester, MA"
+    },
+    {
+        "code": "509",
+        "lat": 47.66,
+        "lon": -117.43,
+        "city": "Spokane, WA"
+    },
+    {
+        "code": "510",
+        "lat": 37.80,
+        "lon": -122.27,
+        "city": "Oakland, CA"
+    },
+    {
+        "code": "512",
+        "lat": 30.27,
+        "lon": -97.74,
+        "city": "Austin, TX"
+    },
+    {
+        "code": "513",
+        "lat": 39.10,
+        "lon": -84.51,
+        "city": "Cincinnati, OH"
+    },
+    {
+        "code": "515",
+        "lat": 41.59,
+        "lon": -93.60,
+        "city": "Des Moines, IA"
+    },
+    {
+        "code": "516",
+        "lat": 40.70,
+        "lon": -73.64,
+        "city": "Garden City, NY"
+    },
+    {
+        "code": "517",
+        "lat": 42.73,
+        "lon": -84.55,
+        "city": "Lansing, MI"
+    },
+    {
+        "code": "518",
+        "lat": 42.65,
+        "lon": -73.76,
+        "city": "Albany, NY"
+    },
+    {
+        "code": "520",
+        "lat": 32.22,
+        "lon": -110.97,
+        "city": "Tucson, AZ"
+    },
+    {
+        "code": "530",
+        "lat": 40.58,
+        "lon": -122.39,
+        "city": "Redding, CA"
+    },
+    {
+        "code": "531",
+        "lat": 41.25,
+        "lon": -95.94,
+        "city": "Omaha, NE"
+    },
+    {
+        "code": "534",
+        "lat": 44.52,
+        "lon": -89.57,
+        "city": "Stevens Point, WI"
+    },
+    {
+        "code": "539",
+        "lat": 36.15,
+        "lon": -95.99,
+        "city": "Tulsa, OK"
+    },
+    {
+        "code": "540",
+        "lat": 37.27,
+        "lon": -79.94,
+        "city": "Roanoke, VA"
+    },
+    {
+        "code": "541",
+        "lat": 44.05,
+        "lon": -123.08,
+        "city": "Eugene, OR"
+    },
+    {
+        "code": "551",
+        "lat": 40.79,
+        "lon": -74.02,
+        "city": "Jersey City, NJ"
+    },
+    {
+        "code": "559",
+        "lat": 36.75,
+        "lon": -119.77,
+        "city": "Fresno, CA"
+    },
+    {
+        "code": "561",
+        "lat": 26.71,
+        "lon": -80.05,
+        "city": "West Palm Beach, FL"
+    },
+    {
+        "code": "562",
+        "lat": 33.77,
+        "lon": -118.19,
+        "city": "Long Beach, CA"
+    },
+    {
+        "code": "563",
+        "lat": 41.52,
+        "lon": -90.58,
+        "city": "Davenport, IA"
+    },
+    {
+        "code": "564",
+        "lat": 46.97,
+        "lon": -122.90,
+        "city": "Olympia, WA"
+    },
+    {
+        "code": "567",
+        "lat": 41.66,
+        "lon": -83.58,
+        "city": "Toledo, OH"
+    },
+    {
+        "code": "570",
+        "lat": 41.41,
+        "lon": -75.66,
+        "city": "Scranton, PA"
+    },
+    {
+        "code": "571",
+        "lat": 38.85,
+        "lon": -77.04,
+        "city": "Arlington, VA"
+    },
+    {
+        "code": "573",
+        "lat": 38.95,
+        "lon": -92.33,
+        "city": "Columbia, MO"
+    },
+    {
+        "code": "574",
+        "lat": 41.68,
+        "lon": -86.25,
+        "city": "South Bend, IN"
+    },
+    {
+        "code": "575",
+        "lat": 32.32,
+        "lon": -106.78,
+        "city": "Las Cruces, NM"
+    },
+    {
+        "code": "580",
+        "lat": 34.60,
+        "lon": -98.40,
+        "city": "Lawton, OK"
+    },
+    {
+        "code": "585",
+        "lat": 43.16,
+        "lon": -77.61,
+        "city": "Rochester, NY"
+    },
+    {
+        "code": "586",
+        "lat": 42.51,
+        "lon": -83.03,
+        "city": "Warren, MI"
+    },
+    {
+        "code": "601",
+        "lat": 32.30,
+        "lon": -90.18,
+        "city": "Jackson, MS"
+    },
+    {
+        "code": "602",
+        "lat": 33.45,
+        "lon": -112.07,
+        "city": "Phoenix, AZ"
+    },
+    {
+        "code": "603",
+        "lat": 43.21,
+        "lon": -71.54,
+        "city": "Concord, NH"
+    },
+    {
+        "code": "605",
+        "lat": 43.55,
+        "lon": -96.70,
+        "city": "Sioux Falls, SD"
+    },
+    {
+        "code": "606",
+        "lat": 38.16,
+        "lon": -82.64,
+        "city": "Ashland, KY"
+    },
+    {
+        "code": "607",
+        "lat": 42.10,
+        "lon": -75.91,
+        "city": "Binghamton, NY"
+    },
+    {
+        "code": "608",
+        "lat": 43.07,
+        "lon": -89.40,
+        "city": "Madison, WI"
+    },
+    {
+        "code": "609",
+        "lat": 40.22,
+        "lon": -74.76,
+        "city": "Trenton, NJ"
+    },
+    {
+        "code": "610",
+        "lat": 40.61,
+        "lon": -75.49,
+        "city": "Allentown, PA"
+    },
+    {
+        "code": "612",
+        "lat": 44.98,
+        "lon": -93.27,
+        "city": "Minneapolis, MN"
+    },
+    {
+        "code": "614",
+        "lat": 39.96,
+        "lon": -83.00,
+        "city": "Columbus, OH"
+    },
+    {
+        "code": "615",
+        "lat": 36.16,
+        "lon": -86.78,
+        "city": "Nashville, TN"
+    },
+    {
+        "code": "616",
+        "lat": 42.96,
+        "lon": -85.67,
+        "city": "Grand Rapids, MI"
+    },
+    {
+        "code": "617",
+        "lat": 42.36,
+        "lon": -71.05,
+        "city": "Boston, MA"
+    },
+    {
+        "code": "618",
+        "lat": 38.52,
+        "lon": -89.98,
+        "city": "Belleville, IL"
+    },
+    {
+        "code": "619",
+        "lat": 32.72,
+        "lon": -117.16,
+        "city": "San Diego, CA"
+    },
+    {
+        "code": "620",
+        "lat": 38.07,
+        "lon": -97.93,
+        "city": "Hutchinson, KS"
+    },
+    {
+        "code": "623",
+        "lat": 33.58,
+        "lon": -112.24,
+        "city": "Glendale, AZ"
+    },
+    {
+        "code": "626",
+        "lat": 34.14,
+        "lon": -118.14,
+        "city": "Pasadena, CA"
+    },
+    {
+        "code": "628",
+        "lat": 37.77,
+        "lon": -122.42,
+        "city": "San Francisco, CA"
+    },
+    {
+        "code": "629",
+        "lat": 36.16,
+        "lon": -86.78,
+        "city": "Nashville, TN"
+    },
+    {
+        "code": "630",
+        "lat": 41.81,
+        "lon": -88.07,
+        "city": "Naperville, IL"
+    },
+    {
+        "code": "631",
+        "lat": 40.82,
+        "lon": -73.20,
+        "city": "Brentwood, NY"
+    },
+    {
+        "code": "636",
+        "lat": 38.79,
+        "lon": -90.57,
+        "city": "St. Charles, MO"
+    },
+    {
+        "code": "641",
+        "lat": 43.15,
+        "lon": -93.20,
+        "city": "Mason City, IA"
+    },
+    {
+        "code": "646",
+        "lat": 40.71,
+        "lon": -74.00,
+        "city": "New York, NY"
+    },
+    {
+        "code": "650",
+        "lat": 37.56,
+        "lon": -122.32,
+        "city": "San Mateo, CA"
+    },
+    {
+        "code": "651",
+        "lat": 44.95,
+        "lon": -93.09,
+        "city": "St. Paul, MN"
+    },
+    {
+        "code": "657",
+        "lat": 33.84,
+        "lon": -117.91,
+        "city": "Anaheim, CA"
+    },
+    {
+        "code": "660",
+        "lat": 38.70,
+        "lon": -93.23,
+        "city": "Sedalia, MO"
+    },
+    {
+        "code": "661",
+        "lat": 35.37,
+        "lon": -119.02,
+        "city": "Bakersfield, CA"
+    },
+    {
+        "code": "662",
+        "lat": 34.26,
+        "lon": -88.70,
+        "city": "Tupelo, MS"
+    },
+    {
+        "code": "667",
+        "lat": 39.29,
+        "lon": -76.61,
+        "city": "Baltimore, MD"
+    },
+    {
+        "code": "669",
+        "lat": 37.33,
+        "lon": -121.89,
+        "city": "San Jose, CA"
+    },
+    {
+        "code": "678",
+        "lat": 33.75,
+        "lon": -84.39,
+        "city": "Atlanta, GA"
+    },
+    {
+        "code": "681",
+        "lat": 38.35,
+        "lon": -81.63,
+        "city": "Charleston, WV"
+    },
+    {
+        "code": "682",
+        "lat": 32.75,
+        "lon": -97.33,
+        "city": "Fort Worth, TX"
+    },
+    {
+        "code": "701",
+        "lat": 46.81,
+        "lon": -100.78,
+        "city": "Bismarck, ND"
+    },
+    {
+        "code": "702",
+        "lat": 36.17,
+        "lon": -115.14,
+        "city": "Las Vegas, NV"
+    },
+    {
+        "code": "703",
+        "lat": 38.85,
+        "lon": -77.04,
+        "city": "Arlington, VA"
+    },
+    {
+        "code": "704",
+        "lat": 35.23,
+        "lon": -80.84,
+        "city": "Charlotte, NC"
+    },
+    {
+        "code": "706",
+        "lat": 33.47,
+        "lon": -81.97,
+        "city": "Augusta, GA"
+    },
+    {
+        "code": "707",
+        "lat": 38.44,
+        "lon": -122.71,
+        "city": "Santa Rosa, CA"
+    },
+    {
+        "code": "708",
+        "lat": 41.61,
+        "lon": -87.80,
+        "city": "Orland Park, IL"
+    },
+    {
+        "code": "712",
+        "lat": 41.26,
+        "lon": -95.85,
+        "city": "Council Bluffs, IA"
+    },
+    {
+        "code": "713",
+        "lat": 29.76,
+        "lon": -95.36,
+        "city": "Houston, TX"
+    },
+    {
+        "code": "714",
+        "lat": 33.84,
+        "lon": -117.91,
+        "city": "Anaheim, CA"
+    },
+    {
+        "code": "715",
+        "lat": 44.96,
+        "lon": -89.63,
+        "city": "Wausau, WI"
+    },
+    {
+        "code": "716",
+        "lat": 42.89,
+        "lon": -78.88,
+        "city": "Buffalo, NY"
+    },
+    {
+        "code": "717",
+        "lat": 40.27,
+        "lon": -76.88,
+        "city": "Harrisburg, PA"
+    },
+    {
+        "code": "718",
+        "lat": 40.71,
+        "lon": -74.00,
+        "city": "New York, NY"
+    },
+    {
+        "code": "719",
+        "lat": 38.83,
+        "lon": -104.82,
+        "city": "Colorado Springs, CO"
+    },
+    {
+        "code": "720",
+        "lat": 39.74,
+        "lon": -104.98,
+        "city": "Denver, CO"
+    },
+    {
+        "code": "724",
+        "lat": 41.05,
+        "lon": -80.05,
+        "city": "Butler, PA"
+    },
+    {
+        "code": "725",
+        "lat": 36.17,
+        "lon": -115.14,
+        "city": "Las Vegas, NV"
+    },
+    {
+        "code": "727",
+        "lat": 27.97,
+        "lon": -82.79,
+        "city": "Clearwater, FL"
+    },
+    {
+        "code": "731",
+        "lat": 35.61,
+        "lon": -88.81,
+        "city": "Jackson, TN"
+    },
+    {
+        "code": "732",
+        "lat": 40.49,
+        "lon": -74.45,
+        "city": "New Brunswick, NJ"
+    },
+    {
+        "code": "734",
+        "lat": 42.27,
+        "lon": -83.74,
+        "city": "Ann Arbor, MI"
+    },
+    {
+        "code": "737",
+        "lat": 30.27,
+        "lon": -97.74,
+        "city": "Austin, TX"
+    },
+    {
+        "code": "740",
+        "lat": 39.94,
+        "lon": -82.01,
+        "city": "Zanesville, OH"
+    },
+    {
+        "code": "747",
+        "lat": 34.18,
+        "lon": -118.61,
+        "city": "Los Angeles, CA"
+    },
+    {
+        "code": "754",
+        "lat": 26.12,
+        "lon": -80.14,
+        "city": "Fort Lauderdale, FL"
+    },
+    {
+        "code": "757",
+        "lat": 36.85,
+        "lon": -76.29,
+        "city": "Norfolk, VA"
+    },
+    {
+        "code": "760",
+        "lat": 33.12,
+        "lon": -117.08,
+        "city": "Escondido, CA"
+    },
+    {
+        "code": "762",
+        "lat": 33.52,
+        "lon": -81.97,
+        "city": "Augusta, GA"
+    },
+    {
+        "code": "763",
+        "lat": 45.09,
+        "lon": -93.40,
+        "city": "Maple Grove, MN"
+    },
+    {
+        "code": "765",
+        "lat": 40.42,
+        "lon": -86.88,
+        "city": "Lafayette, IN"
+    },
+    {
+        "code": "769",
+        "lat": 32.30,
+        "lon": -90.18,
+        "city": "Jackson, MS"
+    },
+    {
+        "code": "770",
+        "lat": 33.95,
+        "lon": -84.55,
+        "city": "Marietta, GA"
+    },
+    {
+        "code": "772",
+        "lat": 27.28,
+        "lon": -80.35,
+        "city": "Port St. Lucie, FL"
+    },
+    {
+        "code": "773",
+        "lat": 41.88,
+        "lon": -87.63,
+        "city": "Chicago, IL"
+    },
+    {
+        "code": "774",
+        "lat": 42.26,
+        "lon": -71.80,
+        "city": "Worcester, MA"
+    },
+    {
+        "code": "775",
+        "lat": 39.53,
+        "lon": -119.81,
+        "city": "Reno, NV"
+    },
+    {
+        "code": "779",
+        "lat": 42.27,
+        "lon": -89.09,
+        "city": "Rockford, IL"
+    },
+    {
+        "code": "781",
+        "lat": 42.36,
+        "lon": -71.21,
+        "city": "Waltham, MA"
+    },
+    {
+        "code": "785",
+        "lat": 39.05,
+        "lon": -95.68,
+        "city": "Topeka, KS"
+    },
+    {
+        "code": "786",
+        "lat": 25.77,
+        "lon": -80.19,
+        "city": "Miami, FL"
+    },
+    {
+        "code": "801",
+        "lat": 40.76,
+        "lon": -111.89,
+        "city": "Salt Lake City, UT"
+    },
+    {
+        "code": "802",
+        "lat": 44.26,
+        "lon": -72.58,
+        "city": "Montpelier, VT"
+    },
+    {
+        "code": "803",
+        "lat": 34.00,
+        "lon": -81.04,
+        "city": "Columbia, SC"
+    },
+    {
+        "code": "804",
+        "lat": 37.54,
+        "lon": -77.43,
+        "city": "Richmond, VA"
+    },
+    {
+        "code": "805",
+        "lat": 34.42,
+        "lon": -119.69,
+        "city": "Santa Barbara, CA"
+    },
+    {
+        "code": "806",
+        "lat": 35.22,
+        "lon": -101.83,
+        "city": "Amarillo, TX"
+    },
+    {
+        "code": "808",
+        "lat": 21.31,
+        "lon": -157.86,
+        "city": "Honolulu, HI"
+    },
+    {
+        "code": "810",
+        "lat": 43.01,
+        "lon": -83.69,
+        "city": "Flint, MI"
+    },
+    {
+        "code": "812",
+        "lat": 38.97,
+        "lon": -86.48,
+        "city": "Bloomington, IN"
+    },
+    {
+        "code": "813",
+        "lat": 27.95,
+        "lon": -82.46,
+        "city": "Tampa, FL"
+    },
+    {
+        "code": "814",
+        "lat": 42.13,
+        "lon": -80.09,
+        "city": "Erie, PA"
+    },
+    {
+        "code": "815",
+        "lat": 42.27,
+        "lon": -89.09,
+        "city": "Rockford, IL"
+    },
+    {
+        "code": "816",
+        "lat": 39.10,
+        "lon": -94.58,
+        "city": "Kansas City, MO"
+    },
+    {
+        "code": "817",
+        "lat": 32.75,
+        "lon": -97.33,
+        "city": "Fort Worth, TX"
+    },
+    {
+        "code": "818",
+        "lat": 33.95,
+        "lon": -118.40,
+        "city": "Los Angeles, CA"
+    },
+    {
+        "code": "828",
+        "lat": 35.59,
+        "lon": -82.55,
+        "city": "Asheville, NC"
+    },
+    {
+        "code": "830",
+        "lat": 29.70,
+        "lon": -98.12,
+        "city": "New Braunfels, TX"
+    },
+    {
+        "code": "831",
+        "lat": 36.67,
+        "lon": -121.66,
+        "city": "Salinas, CA"
+    },
+    {
+        "code": "832",
+        "lat": 29.76,
+        "lon": -95.36,
+        "city": "Houston, TX"
+    },
+    {
+        "code": "843",
+        "lat": 32.78,
+        "lon": -79.93,
+        "city": "Charleston, SC"
+    },
+    {
+        "code": "845",
+        "lat": 41.71,
+        "lon": -73.93,
+        "city": "Poughkeepsie, NY"
+    },
+    {
+        "code": "847",
+        "lat": 42.06,
+        "lon": -87.98,
+        "city": "Arlington Heights, IL"
+    },
+    {
+        "code": "848",
+        "lat": 40.49,
+        "lon": -74.45,
+        "city": "New Brunswick, NJ"
+    },
+    {
+        "code": "850",
+        "lat": 30.44,
+        "lon": -84.28,
+        "city": "Tallahassee, FL"
+    },
+    {
+        "code": "856",
+        "lat": 39.93,
+        "lon": -75.03,
+        "city": "Cherry Hill, NJ"
+    },
+    {
+        "code": "857",
+        "lat": 42.36,
+        "lon": -71.05,
+        "city": "Boston, MA"
+    },
+    {
+        "code": "858",
+        "lat": 32.72,
+        "lon": -117.16,
+        "city": "San Diego, CA"
+    },
+    {
+        "code": "859",
+        "lat": 38.04,
+        "lon": -84.50,
+        "city": "Lexington, KY"
+    },
+    {
+        "code": "860",
+        "lat": 41.76,
+        "lon": -72.67,
+        "city": "Hartford, CT"
+    },
+    {
+        "code": "862",
+        "lat": 40.73,
+        "lon": -74.17,
+        "city": "Newark, NJ"
+    },
+    {
+        "code": "863",
+        "lat": 28.04,
+        "lon": -81.95,
+        "city": "Lakeland, FL"
+    },
+    {
+        "code": "864",
+        "lat": 34.85,
+        "lon": -82.40,
+        "city": "Greenville, SC"
+    },
+    {
+        "code": "865",
+        "lat": 35.96,
+        "lon": -83.92,
+        "city": "Knoxville, TN"
+    },
+    {
+        "code": "870",
+        "lat": 35.84,
+        "lon": -90.70,
+        "city": "Jonesboro, AR"
+    },
+    {
+        "code": "872",
+        "lat": 41.88,
+        "lon": -87.63,
+        "city": "Chicago, IL"
+    },
+    {
+        "code": "878",
+        "lat": 40.44,
+        "lon": -80.00,
+        "city": "Pittsburgh, PA"
+    },
+    {
+        "code": "901",
+        "lat": 35.15,
+        "lon": -90.05,
+        "city": "Memphis, TN"
+    },
+    {
+        "code": "903",
+        "lat": 32.35,
+        "lon": -95.30,
+        "city": "Tyler, TX"
+    },
+    {
+        "code": "904",
+        "lat": 30.33,
+        "lon": -81.65,
+        "city": "Jacksonville, FL"
+    },
+    {
+        "code": "906",
+        "lat": 46.54,
+        "lon": -87.40,
+        "city": "Marquette, MI"
+    },
+    {
+        "code": "907",
+        "lat": 61.22,
+        "lon": -149.90,
+        "city": "Anchorage, AK"
+    },
+    {
+        "code": "908",
+        "lat": 40.66,
+        "lon": -74.22,
+        "city": "Elizabeth, NJ"
+    },
+    {
+        "code": "909",
+        "lat": 34.11,
+        "lon": -117.59,
+        "city": "Rancho Cucamonga, CA"
+    },
+    {
+        "code": "910",
+        "lat": 35.05,
+        "lon": -78.88,
+        "city": "Fayetteville, NC"
+    },
+    {
+        "code": "912",
+        "lat": 32.08,
+        "lon": -81.10,
+        "city": "Savannah, GA"
+    },
+    {
+        "code": "913",
+        "lat": 39.12,
+        "lon": -94.63,
+        "city": "Kansas City, KS"
+    },
+    {
+        "code": "914",
+        "lat": 41.03,
+        "lon": -73.76,
+        "city": "White Plains, NY"
+    },
+    {
+        "code": "915",
+        "lat": 31.76,
+        "lon": -106.49,
+        "city": "El Paso, TX"
+    },
+    {
+        "code": "916",
+        "lat": 38.58,
+        "lon": -121.49,
+        "city": "Sacramento, CA"
+    },
+    {
+        "code": "917",
+        "lat": 40.71,
+        "lon": -74.00,
+        "city": "New York, NY"
+    },
+    {
+        "code": "918",
+        "lat": 36.15,
+        "lon": -95.99,
+        "city": "Tulsa, OK"
+    },
+    {
+        "code": "919",
+        "lat": 35.78,
+        "lon": -78.64,
+        "city": "Raleigh, NC"
+    },
+    {
+        "code": "920",
+        "lat": 44.52,
+        "lon": -88.02,
+        "city": "Green Bay, WI"
+    },
+    {
+        "code": "925",
+        "lat": 37.90,
+        "lon": -122.06,
+        "city": "Concord, CA"
+    },
+    {
+        "code": "928",
+        "lat": 35.16,
+        "lon": -111.45,
+        "city": "Flagstaff, AZ"
+    },
+    {
+        "code": "929",
+        "lat": 40.71,
+        "lon": -74.00,
+        "city": "New York, NY"
+    },
+    {
+        "code": "931",
+        "lat": 36.53,
+        "lon": -87.35,
+        "city": "Clarksville, TN"
+    },
+    {
+        "code": "936",
+        "lat": 31.34,
+        "lon": -94.73,
+        "city": "Lufkin, TX"
+    },
+    {
+        "code": "937",
+        "lat": 39.76,
+        "lon": -84.19,
+        "city": "Dayton, OH"
+    },
+    {
+        "code": "940",
+        "lat": 33.91,
+        "lon": -98.49,
+        "city": "Wichita Falls, TX"
+    },
+    {
+        "code": "941",
+        "lat": 27.49,
+        "lon": -82.57,
+        "city": "Bradenton, FL"
+    },
+    {
+        "code": "947",
+        "lat": 42.55,
+        "lon": -83.21,
+        "city": "Troy, MI"
+    },
+    {
+        "code": "949",
+        "lat": 33.68,
+        "lon": -117.77,
+        "city": "Irvine, CA"
+    },
+    {
+        "code": "951",
+        "lat": 33.95,
+        "lon": -117.39,
+        "city": "Riverside, CA"
+    },
+    {
+        "code": "952",
+        "lat": 44.84,
+        "lon": -93.30,
+        "city": "Bloomington, MN"
+    },
+    {
+        "code": "954",
+        "lat": 26.12,
+        "lon": -80.14,
+        "city": "Fort Lauderdale, FL"
+    },
+    {
+        "code": "956",
+        "lat": 27.50,
+        "lon": -99.51,
+        "city": "Laredo, TX"
+    },
+    {
+        "code": "959",
+        "lat": 41.76,
+        "lon": -72.67,
+        "city": "Hartford, CT"
+    },
+    {
+        "code": "970",
+        "lat": 40.59,
+        "lon": -105.08,
+        "city": "Fort Collins, CO"
+    },
+    {
+        "code": "971",
+        "lat": 45.52,
+        "lon": -122.68,
+        "city": "Portland, OR"
+    },
+    {
+        "code": "972",
+        "lat": 32.78,
+        "lon": -96.80,
+        "city": "Dallas, TX"
+    },
+    {
+        "code": "973",
+        "lat": 40.73,
+        "lon": -74.17,
+        "city": "Newark, NJ"
+    },
+    {
+        "code": "978",
+        "lat": 42.63,
+        "lon": -71.32,
+        "city": "Lowell, MA"
+    },
+    {
+        "code": "979",
+        "lat": 30.63,
+        "lon": -96.33,
+        "city": "College Station, TX"
+    },
+    {
+        "code": "980",
+        "lat": 35.23,
+        "lon": -80.84,
+        "city": "Charlotte, NC"
+    },
+    {
+        "code": "984",
+        "lat": 47.24,
+        "lon": -122.43,
+        "city": "Tacoma, WA"
+    },
+    {
+        "code": "985",
+        "lat": 30.50,
+        "lon": -90.47,
+        "city": "Hammond, LA"
+    },
+    {
+        "code": "989",
+        "lat": 43.42,
+        "lon": -83.95,
+        "city": "Saginaw, MI"
+    }
+]
