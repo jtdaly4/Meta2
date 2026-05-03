@@ -6,7 +6,7 @@ import * as xlsx from "xlsx";
 
 const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.join(__dirname, "..", "..");
+const ROOT = path.join(__dirname, "..");
 
 const SPEC_FILE = "Spec Tracker (House Cube) 4.14.2026 - SC Version.xlsx";
 

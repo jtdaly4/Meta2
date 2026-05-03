@@ -6,11 +6,13 @@ import idxRouter from "./idx";
 import inventoryRouter from "./inventory";
 import routeCitiesRouter from "./route-cities";
 import configRouter from "./config";
+import buyersRouter from "./buyers";
 
 const router: IRouter = Router();
 
 router.use(healthRouter);
 router.use(flightsRouter);
+router.use(buyersRouter);
 router.use("/parcl", parclRouter);
 router.use("/idx", idxRouter);
 router.use("/inventory", inventoryRouter);

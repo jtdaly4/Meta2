@@ -6,7 +6,7 @@ import * as xlsx from "xlsx";
 
 const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.join(__dirname, "..", "..");
+const ROOT = path.join(__dirname, "..");
 const PUBLIC_DIR = path.join(ROOT, "public");
 
 const HUB_IATA = new Set(["PGD", "SRQ"]);
